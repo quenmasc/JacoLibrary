@@ -11,7 +11,6 @@ import wave
 import os
 from threading import Thread
 import RingBuffer
-import mfcc
 import spectral_entropy
 import function
 import mfccbuffer
@@ -114,9 +113,7 @@ class Record(object) :
         self.__read_process.terminate()
         self.__write_process.terminate()
         self.__RingBuffer_write_process.terminate()
-    """__author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
-__date__="2017-04-14"
-__version__="1.0-dev" get all data from audiuo devices """
+        
     def read(self):
 
         return self.__read_queue.get() , self.__read_frame.get()     
