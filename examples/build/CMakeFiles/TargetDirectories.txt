@@ -1,0 +1,3 @@
+/home/pi/libkindrv/examples/build/CMakeFiles/edit_cache.dir
+/home/pi/libkindrv/examples/build/CMakeFiles/rebuild_cache.dir
+/home/pi/libkindrv/examples/build/CMakeFiles/libkindrv_main.dir

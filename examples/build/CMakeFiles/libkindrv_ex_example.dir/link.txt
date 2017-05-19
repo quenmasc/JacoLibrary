@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11 -lpython2.7 -lpthread   CMakeFiles/libkindrv_ex_example.dir/ex_example.cpp.o  -o libkindrv_ex_example  -L/usr/local/lib -rdynamic -lkindrv -lboost_system -Wl,-rpath,/usr/local/lib 

@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/pi/libkindrv/examples/main.cpp
+stdio.h
+-
+stdlib.h
+-
+iostream
+-
+thread
+-
+iostream
+-
+fstream
+-
+string
+-
+vector
+-
+sys/stat.h
+-
+libkindrv/kindrv.h
+-
+

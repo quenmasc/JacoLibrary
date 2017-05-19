@@ -7,13 +7,13 @@ mark_as_advanced(LIBKINDRV_LIB LIBKINDRV_INCLUDE_DIR)
 
 # find installed kindrv library and include dir
 set (LIBKINDRV_FOUND FALSE CACHE STRING "FALSE" FORCE)
-
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpython2.7 -lpthread -Wall ")
 include (FindPkgConfig OPTIONAL)
 if (PKG_CONFIG_FOUND)
   # find libkindrv with pkg-config (recommended)
   pkg_check_modules (LIBKINDRV REQUIRED libkindrv)
-
 else (PKG_CONFIG_FOUND)
+
   message (WARNING "FindPkgConfig not found, cannot use pkg-config to detect"
                    " libkindrv. Using custom cmake code to find libkinrv"
                    " and adding boost dependency (not recommended)")
@@ -39,8 +39,8 @@ else (PKG_CONFIG_FOUND)
 
   # find boost-system
   find_package (Boost REQUIRED COMPONENTS system)
-  set (LIBKINDRV_LIBRARIES ${LIBKINDRV_LIBRARIES} ${Boost_LIBRARIES})
-  set (LIBKINDRV_INCLUDE_DIRS ${LIBKINDRV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+  set (LIBKINDRV_LIBRARIES ${LIBKINDRV_LIBRARIES} ${Boost_LIBRARIES} )
+  set (LIBKINDRV_INCLUDE_DIRS ${LIBKINDRV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} )
 endif (PKG_CONFIG_FOUND)
 
 if (LIBKINDRV_FOUND)
@@ -52,12 +52,16 @@ else (LIBKINDRV_FOUND)
   message(FATAL_ERROR "Could not find libkindrv!")
 endif (LIBKINDRV_FOUND)
 
-add_executable (libkindrv_ex_simple ex_simple.cpp)
-add_executable (libkindrv_ex_ctrl ex_ctrl.cpp)
-add_executable (libkindrv_ex_joystick ex_joystick.cpp)
-add_executable (libkindrv_ex_dualarm ex_dualarm.cpp)
+#add_executable (libkindrv_ex_simple ex_simple.cpp)
+#add_executable (libkindrv_ex_ctrl ex_ctrl.cpp)
+#add_executable (libkindrv_ex_joystick ex_joystick.cpp)
+#add_executable (libkindrv_ex_dualarm ex_dualarm.cpp)
+#add_executable (libkindrv_ex_main ex_main.cpp )
+add_executable (libkindrv_main main.cpp )
 
-target_link_libraries (libkindrv_ex_simple ${LIBKINDRV_LIBRARIES})
-target_link_libraries (libkindrv_ex_ctrl ${LIBKINDRV_LIBRARIES})
-target_link_libraries (libkindrv_ex_joystick ${LIBKINDRV_LIBRARIES})
-target_link_libraries (libkindrv_ex_dualarm ${LIBKINDRV_LIBRARIES})
+#target_link_libraries (libkindrv_ex_simple ${LIBKINDRV_LIBRARIES})
+#target_link_libraries (libkindrv_ex_ctrl ${LIBKINDRV_LIBRARIES})
+#target_link_libraries (libkindrv_ex_joystick ${LIBKINDRV_LIBRARIES})
+#target_link_libraries (libkindrv_ex_dualarm ${LIBKINDRV_LIBRARIES})
+#target_link_libraries (libkindrv_ex_main  ${LIBKINDRV_LIBRARIES})
+target_link_libraries (libkindrv_main  ${LIBKINDRV_LIBRARIES} )
