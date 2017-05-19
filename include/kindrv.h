@@ -28,8 +28,20 @@
 
 #include "types.h"
 #include "exception.h"
-
+#include "ModeChange.h"
+#include "Robot_IMU_Control.h"
+#include "mySerial.h"
+#include "Defined_Macro.h"
+#include <unistd.h>
 #include <boost/thread/mutex.hpp>
+#include <usb.h>
+#include <unistd.h>     // UNIX standard function definitions
+#include <fcntl.h>      // File control definitions
+#include <errno.h>      // Error number definitions
+#include <termios.h>    // POSIX terminal control definitions#include <stdio.h>
+#include <iostream>
+#include <cstring>
+#include "PythonBridge.h"
 
 struct libusb_device;
 struct libusb_device_handle;
