@@ -39,7 +39,7 @@ def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
     return R1 , R2 , P1 , P2
 
 def TrainBestParams(params,features,classLabel):
-    svm=sklearn.svm.SVC(**params)
+    svm=sklearn.svm.SVC(probability=True,**params)
     svm.fit(features,classLabel)
     return svm
 

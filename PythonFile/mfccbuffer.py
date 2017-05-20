@@ -57,8 +57,8 @@ class MFFCsRingBuffer(object):
                 idx=(0+np.arange(self.__tail))
                 temp=np.array(self.__data[idx])
                 ######### NEW add 2017.05.11 #####
-                MFCCsN=DSP.FeatureNormalization(temp)
-                MFCCs=MFCCsN.reshape((len(idx)/13),13).T
+				# comment 20 05 2017 MFCCsN=DSP.FeatureNormalization(temp)
+                MFCCs=temp.reshape((len(idx)/13),13).T
                 ######### END NEW add ####### NORMALIZATION ####
                 delta=function.deltaMFCCs(MFCCs,9)
                 deltaDelta=function.deltaMFCCs(delta,9)

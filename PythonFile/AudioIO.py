@@ -228,16 +228,16 @@ def train():
     print tools.bcolors.OKGREEN + "All SVM Trained have been saved" + tools.bcolors.ENDC
     
 if __name__=='__main__' :
-   # FindWavFileAndStoreData()
- # test()
- # train()
-   model=LoadClassifier("SVM_Trained")
-   modelL=0 #LoadClassifier("LeftSVM_Trained")
-   modelR=0 #LoadClassifier("RightSVM_Trained")
+  # FindWavFileAndStoreData()
+  test()
+  train()
+   #model=LoadClassifier("SVM_Trained")
+   #modelL=0 #LoadClassifier("LeftSVM_Trained")
+  #modelR=0 #LoadClassifier("RightSVM_Trained")
  # print(model)
-   features=np.loadtxt('coeff.out')
+ #  features=np.loadtxt('coeff.out')
  # print len(features)
-   R1 , R2 , P1 , P2=MachineLearning.ClassifierWrapper(model, modelL, modelR,features)
-   print R1, R2
+#   R1 , R2 , P1 , P2=MachineLearning.ClassifierWrapper(model, modelL, modelR,features)
+ #  print R1, R2
 
    
