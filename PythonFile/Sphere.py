@@ -16,18 +16,18 @@ class Sphere_calibration(object):
 		self.__center=np.array([0,0,0])
 	
 	def Length(self, features):
-		self.__DataLength=180 #features.shape[0]
-		self.__feature=np.zeros((39,180*150))
-		self.__Output=np.zeros(180*1950) # 13 * 150
+		self.__DataLength=features.shape[1]
+		self.__feature=np.zeros((39,features.shape[1]*150))
+		#self.__Output=np.zeros(features.shape[1]*1950) # 13 * 150
 		#return DataLength , feature, Output
 		
-	def ClassAndFeaturesSplit(self, features, label):
+	def ClassAndFeaturesSplit(self, features):
 		self.Length(features)
 		for i in range(0,self.__DataLength):
 			idx=(i*150+np.arange(150))
-			idx_2=(i*1950+np.arange(1950))
-			self.__feature[:,idx]=np.reshape(features,(39,150), order='F')
-			self.__Output[idx_2]=numpy.matlib.repmat(label,1,1950)
+			#idx_2=(i*1950+np.arange(1950))
+			self.__feature[:,idx]=np.reshape(features[:,i],(39,150), order='F')
+			#self.__Output[idx_2]=numpy.matlib.repmat(label,1,1950)
 		# reshape all matrix in 3 vector -> MFCC, VMFCC, VVMFCC
 		x=self.__feature[(0+np.arange(13)),:].reshape(self.__feature[(0+np.arange(13)),:].size, order='F')
 		y=self.__feature[(13+np.arange(13)),:].reshape(self.__feature[(13+np.arange(13)),:].size, order='F')
@@ -69,6 +69,10 @@ class Sphere_calibration(object):
 		SphereData=np.zeros((self.__DataLength*150*13,3))
 		for i in range(0,3):
 			SphereData[:,i]=Q*P[:,i]
+		for i in range (0,3):
+			for j in range(0,self.__DataLength*150*13):
+				if math.isnan(SphereData[j,i])==True :
+					SphereData[j,i]=0
 		feat_struct=np.concatenate((SphereData[:,0].reshape(13,150*self.__DataLength,order='F'),SphereData[:,1].reshape(13,150*self.__DataLength,order='F'),SphereData[:,2].reshape(13,150*self.__DataLength,order='F')),axis=0)
 		
 		# return features matrix
@@ -77,7 +81,7 @@ class Sphere_calibration(object):
 		for i in range (0,self.__DataLength):
 			intermediaire=feat_struct[:,(i*150+np.arange(150))]
 			features[:,i]=intermediaire.reshape(intermediaire.size, order='F')
-		print(features)
+	#	print(features)
 		return features
 
 if __name__ == "__main__" :

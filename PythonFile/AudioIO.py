@@ -13,6 +13,7 @@ import wave
 import MachineLearning
 from sklearn.externals import joblib
 import tools
+import Sphere
 
 __author__="Quentin MASCRET <quentin.mascret.1 ulaval.ca>"
 __date__="2017-05-03"
@@ -144,6 +145,7 @@ def FistSVMClass(listOfDirs):
 
 def ReadFeatureClass():
     listdirectory = os.listdir(".")
+    Normalization=Sphere.Sphere_calibration()
     Features=np.array([]).reshape(5850,0)
     FeaturesLeft=np.array([]).reshape(5850,0)
     FeaturesRight=np.array([]).reshape(3120,0)
@@ -154,7 +156,7 @@ def ReadFeatureClass():
     for filename in listdirectory :
         if FolderClassDictionnary(filename)>0:
             os.chdir(filename)
-            data=(np.loadtxt(os.listdir(".")[0])).T
+            data=Normalization.ClassAndFeaturesSplit((np.loadtxt(os.listdir(".")[0])).T)
             classFistLevel=np.matlib.repmat(FistSVMClass(filename),1,data.shape[1])
             classNormal=np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])
             os.chdir('../')
