@@ -156,7 +156,7 @@ def ReadFeatureClass():
     for filename in listdirectory :
         if FolderClassDictionnary(filename)>0:
             os.chdir(filename)
-            data=Normalization.ClassAndFeaturesSplit((np.loadtxt(os.listdir(".")[0])).T)
+            data=(np.loadtxt(os.listdir(".")[0])).T
             classFistLevel=np.matlib.repmat(FistSVMClass(filename),1,data.shape[1])
             classNormal=np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])
             os.chdir('../')
@@ -172,7 +172,7 @@ def ReadFeatureClass():
             ClassFistLevel=np.hstack([ClassFistLevel,classFistLevel])
             ClassNormal=np.hstack([ClassNormal,classNormal])
     print tools.bcolors.OKGREEN + "In AudioIO - ReadFeatureClass : all features have been read." +tools.bcolors.ENDC
-    return Features,FeaturesLeft, FeaturesRight , ClassLeft[0],ClassRight[0],ClassFistLevel[0],ClassNormal[0]
+    return Normalization.ClassAndFeaturesSplit(Features),Normalization.ClassAndFeaturesSplit(FeaturesLeft), FeaturesRight , ClassLeft[0],ClassRight[0],ClassFistLevel[0],ClassNormal[0]
 
 
 def SaveClassifier(modelName,svmClassifier):

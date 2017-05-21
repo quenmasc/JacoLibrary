@@ -5,7 +5,7 @@ import math
 import struct
 import array
 import time
-
+import tools
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-04-14"
 __version__="1.1-dev"
@@ -81,7 +81,7 @@ class Sphere_calibration(object):
 		for i in range (0,self.__DataLength):
 			intermediaire=feat_struct[:,(i*150+np.arange(150))]
 			features[:,i]=intermediaire.reshape(intermediaire.size, order='F')
-	#	print(features)
+		print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ..." + tools.bcolors.ENDC
 		return features
 
 if __name__ == "__main__" :
