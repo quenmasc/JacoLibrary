@@ -6,9 +6,14 @@ import struct
 import array
 import time
 import tools
+import cPickle
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+ 
+
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
-__date__="2017-04-14"
-__version__="1.1-dev"
+__date__="2017-05-20"
+__version__="1.0-dev"
 
 class Sphere_calibration(object):
 	def __init__(self):
@@ -21,7 +26,7 @@ class Sphere_calibration(object):
 		#self.__Output=np.zeros(features.shape[1]*1950) # 13 * 150
 		#return DataLength , feature, Output
 		
-	def ClassAndFeaturesSplit(self, features):
+	def ClassAndFeaturesSplit(self, features,types):
 		self.Length(features)
 		for i in range(0,self.__DataLength):
 			idx=(i*150+np.arange(150))
@@ -33,14 +38,41 @@ class Sphere_calibration(object):
 		y=self.__feature[(13+np.arange(13)),:].reshape(self.__feature[(13+np.arange(13)),:].size, order='F')
 		z=self.__feature[(26+np.arange(13)),:].reshape(self.__feature[(26+np.arange(13)),:].size, order='F')
 		
-		# mean and std of x, y and z
-		meanx=np.mean(x)
-		meany=np.mean(y)
-		meanz=np.mean(z)
-		stdx=np.std(x)
-		stdy=np.std(y)
-		stdz=np.std(z)
 		
+		if (types == "train"):
+		
+		# mean and std of x, y and z
+			meanx=np.mean(x)
+			meany=np.mean(y)
+			meanz=np.mean(z)
+			stdx=np.std(x)
+			stdy=np.std(y)
+			stdz=np.std(z)
+			fo=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","wb")
+			cPickle.dump(meanx,fo,protocol=cPickle.HIGHEST_PROTOCOL)
+			cPickle.dump(meany,fo,protocol=cPickle.HIGHEST_PROTOCOL)
+			cPickle.dump(meanz,fo,protocol=cPickle.HIGHEST_PROTOCOL)
+			cPickle.dump(stdx,fo,protocol=cPickle.HIGHEST_PROTOCOL)
+			cPickle.dump(stdy,fo,protocol=cPickle.HIGHEST_PROTOCOL)
+			cPickle.dump(stdz,fo,protocol=cPickle.HIGHEST_PROTOCOL)
+			fo.close()
+			
+		elif (types == "test" ):	
+			try :
+				fl=open("/home/pi/libkindrv/PythonFile/Mean_and_Std","rb")
+			except IOError :
+				print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
+				return
+			try :
+				meanx=cPickle.load(fl)
+				meany=cPickle.load(fl)
+				meanz=cPickle.load(fl)
+				stdx=cPickle.load(fl)
+				stdy=cPickle.load(fl)
+				stdz=cPickle.load(fl)
+			except :
+				fl.close()
+			fl.close()
 		# 0 mean and one std
 				## allocation of memory
 		new_x=np.zeros(self.__DataLength*150*13)
@@ -74,7 +106,18 @@ class Sphere_calibration(object):
 				if math.isnan(SphereData[j,i])==True :
 					SphereData[j,i]=0
 		feat_struct=np.concatenate((SphereData[:,0].reshape(13,150*self.__DataLength,order='F'),SphereData[:,1].reshape(13,150*self.__DataLength,order='F'),SphereData[:,2].reshape(13,150*self.__DataLength,order='F')),axis=0)
-		
+		## plot 3D
+		#fig=plt.figure()
+		#ax=fig.add_subplot(111,projection='3d')
+		#xs=SphereData[:,0]
+		#ys=SphereData[:,1]
+		#zs=SphereData[:,2]
+		#ax.scatter(xs,ys,zs,c='r',marker='o')
+		#
+		#ax.set_xlabel('X Label')
+		#ax.set_ylabel('Y Label')
+		#ax.set_zlabel('Z Label')
+		#plt.show()
 		# return features matrix
 				## allocation of memory
 		features=np.zeros((39*150,self.__DataLength))

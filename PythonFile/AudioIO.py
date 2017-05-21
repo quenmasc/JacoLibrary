@@ -172,7 +172,7 @@ def ReadFeatureClass():
             ClassFistLevel=np.hstack([ClassFistLevel,classFistLevel])
             ClassNormal=np.hstack([ClassNormal,classNormal])
     print tools.bcolors.OKGREEN + "In AudioIO - ReadFeatureClass : all features have been read." +tools.bcolors.ENDC
-    return Normalization.ClassAndFeaturesSplit(Features),Normalization.ClassAndFeaturesSplit(FeaturesLeft), FeaturesRight , ClassLeft[0],ClassRight[0],ClassFistLevel[0],ClassNormal[0]
+    return Normalization.ClassAndFeaturesSplit(Features,"train"),FeaturesLeft, FeaturesRight , ClassLeft[0],ClassRight[0],ClassFistLevel[0],ClassNormal[0]
 
 
 def SaveClassifier(modelName,svmClassifier):
