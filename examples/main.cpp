@@ -10,7 +10,7 @@
 #include <libkindrv/kindrv.h>
 
 using namespace KinDrv;
- PythonBridge Bridge ;
+PythonBridge Bridge ;
 
 /* JACO ARM INITIALIZATION */
 int
@@ -151,6 +151,22 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 					arm->release_joystick();
 			}
 			break;
+			case 3 :
+				if(OldClass!=3){
+					axes.trans_lr = 2.5;
+					arm->move_joystick_axis(axes);
+					usleep(2e6);
+					arm->release_joystick();
+				}
+			break;
+			case 4 :
+				if(OldClass!=4){
+					axes.trans_lr = -2.5;
+					arm->move_joystick_axis(axes);
+					usleep(2e6);
+					arm->release_joystick();
+				}
+			break;
 			default :
 				OldClass=0;
 				break;
@@ -174,6 +190,7 @@ void fol(){
 void mess(JacoArm *arm,jaco_joystick_axis_t axes){
 	sleep(2);
 	const char *fifo_name="/home/pi/libkindrv/examples/build/fifo";
+	std::cout << "Pipe is opened" << std::endl;
 	int OldClass;
 	int n;
 	while(1){
