@@ -15,6 +15,7 @@ import tools
 import os
 import time
 import errno
+import Sphere
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-05-11"
@@ -22,7 +23,7 @@ __version__="1.0-dev"
 
 class Speech_Recognition(object):
     """ Semaphore """
-    MfccsCoeff=np.empty((39,200),'f')
+    MfccsCoeff=np.empty((39,150),'f')
     ClassLab=0
     """ Thread """ 
     def __init__(self):
@@ -86,7 +87,7 @@ class Speech_Recognition(object):
             data, length = audio.read()
             pdata=audio.pseudonymize(data)
             ndata=DSP.normalize(pdata,32767.0)
-            audio.RingBufferWrite(ndata)
+            audio.RingBufferWrite(function.LowPass(ndata))
             if (c==[]) :
                 c=audio.RingBufferRead()
             else :
@@ -99,11 +100,9 @@ class Speech_Recognition(object):
 
             else :
                 for i in range(0,2) :
-
-
-                # return MFCC and spectral entropy
-                    coeff,energy=mfcc.MFCC(np.array(c[i]))
-                    SEntropy=entropy.SpectralEntropy(np.array(c[i]))
+					# return MFCC and spectral entropy
+                    coeff,energy=mfcc.MFCC(np.array((c[i])))
+                    SEntropy=entropy.SpectralEntropy(np.array((c[i])))
                     if j<100 :
 
                         mfccNoise+=np.array(coeff)
@@ -118,10 +117,15 @@ class Speech_Recognition(object):
                                 entropyData.append(function.distance(Data[k],entropyNoise))
                             entrrolpyThreshNoise =function.MeanStandardDeviation(entropyData,3)
                             print tools.bcolors.OKBLUE + "Recording is now allowed" +tools.bcolors.ENDC
+                            n=deque([])
+                            for i in range(0,20):
+								n.append(entropyData[79+i])
+                            entropyData=deque([])
+                            entropyData=n
                     else :
                     # return MFCC and Spectral Entropy background noise
-                        mfccN=function.updateMFCCsNoise(np.array(coeff),mfccNoise, 0.90)
-                        entropyN=function.updateEntropyNoise(SEntropy,entropyNoise, 0.95)
+                        mfccN=function.updateMFCCsNoise(np.array(coeff),mfccNoise, 0.95)
+                        entropyN=function.updateEntropyNoise(SEntropy,entropyNoise, 0.9)
                     
                     # return correlation and distance of MFCC and Entropy
                         corr=function.correlation_1D(np.array(coeff),mfccN)
@@ -133,7 +137,7 @@ class Speech_Recognition(object):
                     # update threshold 
 
                         th[i]=function.sigmoid(10,5,corr)
-                        entropyThresh=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.96)
+                        entropyThresh=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.8)
 
                         fl=buff.flag(corr,th[i],entropyDistance,entropyThresh,coeff,energy,np.array(c[i]))
                         if fl=="admit" :
@@ -154,6 +158,7 @@ class Speech_Recognition(object):
         
     def SVM(self):
         global MfccsCoeff
+        CoeffSphere=Sphere.Sphere_calibration();
         try :
             os.remove('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name)
         except :
@@ -165,15 +170,20 @@ class Speech_Recognition(object):
                 print("File already exist")
             else :
                 raise
-       # print "In function"
+        print tools.bcolors.OKGREEN + "In SVM Method - All done" + tools.bcolors.ENDC
+		
         self.__condition.acquire()
+        
         while True :
+			
             self.__condition.wait()
             self.__semaphore.acquire()
-            classLab=AudioIO.ClassName(int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,MfccsCoeff)[0][0]))
-            classL=int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,MfccsCoeff)[0][0])
-            print classLab
+            newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeff,"test")).T
             self.__semaphore.release()
+            classLab=AudioIO.ClassName(int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[0][0]))
+            classL=int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[0][0])
+            print(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[2][0])
+            print classLab
             self.write_Pipe(classL)
         self.__condition.release()
            # return classLab
@@ -182,13 +192,14 @@ class Speech_Recognition(object):
             with open(self.__fifo_name,'wb') as f:
                 f.write('{}\n'.format(len(bin(classL)[2:])).encode())
                 f.write(bin(classL)[2:])
+                f.flush()
            # print "Done ..."
 
 
         
     def run(self):
          i=0
-         self.__t1=threading.Thread(target=self.Recorder)
+         self.__t1=threading.Thread(target=self.Recorder) 
          self.__t2=threading.Thread(target=self.SVM)
          self.__t1.start()
          self.__t2.start()

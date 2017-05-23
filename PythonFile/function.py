@@ -10,7 +10,7 @@ import os
 import scipy
 import numpy.matlib as mat
 from Tkinter import END
-from scipy.signal import lfilter
+from scipy.signal import lfilter , firwin
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-04-26"
@@ -50,3 +50,10 @@ def deltaMFCCs(MFCCs,w):
        d=lfilter(win,1,xx,axis=1)
        last_step=d[:,2*hlen+np.arange(MFCCs.size/len(MFCCs))]
        return last_step
+  
+def LowPass(data):
+	N=10
+	Fc=3750
+	Fs=8000
+	h=scipy.signal.firwin(numtaps=N,cutoff=Fc,nyq=Fs/2)
+	return scipy.signal.lfilter(h,1.0,data,axis=0)

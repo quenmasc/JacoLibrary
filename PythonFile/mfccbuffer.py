@@ -130,7 +130,7 @@ class MFFCsRingBuffer(object):
                                 self.__data=np.zeros(1950)
                         else :
                                 self.__flag="admit"
-
+				
                 return self.__flag
                                 
                 
