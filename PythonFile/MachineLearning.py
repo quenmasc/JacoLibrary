@@ -53,8 +53,8 @@ def TrainSVM_RBF_Features(features,classLabel):
    # featuresTrain,featuresTest ,classTrain, ClassTest = MachineLearning.Splitfeatures(features.T,classL.T,0.9)
 
     # C and Gamma range
-    C= np.logspace(-6,3,20)
-    Gamma=np.logspace(-9,3,20)
+    C= np.logspace(-6,3,100) #20
+    Gamma=np.logspace(-9,3,100)#20
 
     # paramgrid
     param_grid=dict(gamma=Gamma, C=C)
@@ -64,7 +64,7 @@ def TrainSVM_RBF_Features(features,classLabel):
 
     # grid
     print tools.bcolors.OKBLUE + "Running ..." + tools.bcolors.ENDC
-    grid =GridSearchCV(SVC(),param_grid=param_grid,cv=StratifiedKFold(classLabel,k=17),verbose=40,n_jobs=2)
+    grid =GridSearchCV(SVC(),param_grid=param_grid,cv=StratifiedKFold(classLabel,k=100),verbose=40,n_jobs=2) # k=17
     grid.fit(features,classLabel)
     return grid
     

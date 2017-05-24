@@ -28,6 +28,8 @@ class Sphere_calibration(object):
 		
 	def ClassAndFeaturesSplit(self, features,types):
 		#self.Length(features)
+		
+			
 		self.__DataLength=int(features.size/features.shape[0])
 		self.__feature=np.zeros((39,self.__DataLength*150))
 		if (types=="train"):
@@ -140,6 +142,8 @@ class Sphere_calibration(object):
 			intermediaire=feat_struct[:,(i*150+np.arange(150))]
 			features[:,i]=intermediaire.reshape(intermediaire.size, order='F')
 		print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ..." + tools.bcolors.ENDC
+					
+					
 		return features
 
 if __name__ == "__main__" :

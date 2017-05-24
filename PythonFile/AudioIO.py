@@ -14,6 +14,8 @@ import MachineLearning
 from sklearn.externals import joblib
 import tools
 import Sphere
+from scipy.stats import pearsonr
+import time
 
 __author__="Quentin MASCRET <quentin.mascret.1 ulaval.ca>"
 __date__="2017-05-03"
@@ -91,6 +93,7 @@ def FeaturesSaved(struct):
         file(ClassDictionnaryFile(struct[0]),'a').close()
         np.savetxt(ClassDictionnaryFile(struct[0]),struct[1])
     else :
+
         data=np.loadtxt(ClassDictionnaryFile(struct[0]))
         data=np.vstack([data,struct[1]])
         np.savetxt(ClassDictionnaryFile(struct[0]),data)
@@ -228,9 +231,35 @@ def train():
  #   SaveClassifier("RightSVM_Trained",SVMR)
  #   print tools.bcolors.HEADER + "Right SVM Trained saved" + tools.bcolors.ENDC
     print tools.bcolors.OKGREEN + "All SVM Trained have been saved" + tools.bcolors.ENDC
-    
+ 
+ 
+def correl ():
+	Normalization=Sphere.Sphere_calibration()
+	listdirectory = os.listdir(".")
+	data=Normalization.ClassAndFeaturesSplit(np.loadtxt("coeff.out"),"test")
+	for filename in listdirectory:
+			if(FolderClassDictionnary(filename)==7):
+				os.chdir(filename)
+				data_TEST=Normalization.ClassAndFeaturesSplit((np.loadtxt(os.listdir(".")[0])).T,"train")
+				os.chdir('../')
+				mn=np.array([])#.reshape(5850,0)
+				m=np.zeros((5850,data_TEST.shape[1]))
+				for j in range(0,data_TEST.shape[1]):
+					
+					for i in range(0, data.size):
+						m[i,j]=(data[i]-data_TEST[i,j]).T
+				print m.shape ,"\n mean:", np.mean(m,axis=1), "\n std :" , np.std(m,axis=1)
+				np.savetxt('Param.out',(np.mean(m,axis=1), np.std(m, axis=1)))
+				#print "Class :" ,FolderClassDictionnary(filename) ,"\n", "moy : ", mn 
+				
+					#print(pearsonr(data,data_TEST[:,j]))
+					#time.sleep(2)
+            
+            
 if __name__=='__main__' :
   # FindWavFileAndStoreData()
+
+ #correl()
   test()
   train()
    #model=LoadClassifier("SVM_Trained")
