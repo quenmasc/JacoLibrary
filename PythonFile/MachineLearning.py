@@ -60,11 +60,11 @@ def TrainSVM_RBF_Features(features,classLabel):
     param_grid=dict(gamma=Gamma, C=C)
 
     # cv
-   # cv = StratifiedShuffleSplit(n_splits=50 , test_size=0.1, random_state=42)
+    cv = StratifiedShuffleSplit(classLabel,n_iter=10 , test_size=0.1, train_size=0.9,random_state=42)
 
     # grid
     print tools.bcolors.OKBLUE + "Running ..." + tools.bcolors.ENDC
-    grid =GridSearchCV(SVC(),param_grid=param_grid,cv=StratifiedKFold(classLabel,k=17),verbose=40,n_jobs=2) # k=17
+    grid =GridSearchCV(SVC(),param_grid=param_grid,cv=cv,verbose=40,n_jobs=2) # k=17 StratifiedKFold(classLabel,k=17)
     grid.fit(features,classLabel)
     return grid
     
