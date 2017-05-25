@@ -83,14 +83,14 @@ class MFCCs(object):
         return LiftCepstralCoeff,logEnergy
         
     def MFCC2(self, frame):
-	magnitude=np.absolute(self.magnitude(frame))
-        logEnergy=math.log(math.fsum((np.absolute(self.magnitude(frame*32768.0)))**2))
+			magnitude=np.absolute(self.magnitude(frame))
+			logEnergy=math.log(math.fsum((np.absolute(self.magnitude(frame*32768.0)))**2))
         # filterBannk application to the uniquee part of FFT
-        FBA= self.__FilterBank.dot(magnitude[(0+np.arange(self.__nfft/2+1))])
-        CepstralCoeff=self.__dct.dot(np.log(FBA))
-        LiftCepstralCoeff=np.diag(self.__LowFilterLift).dot(CepstralCoeff)
-        LiftCepstralCoeff[0]=logEnergy
-        return LiftCepstralCoeff 
+			FBA= self.__FilterBank.dot(magnitude[(0+np.arange(self.__nfft/2+1))])
+			CepstralCoeff=self.__dct.dot(np.log(FBA))
+			LiftCepstralCoeff=np.diag(self.__LowFilterLift).dot(CepstralCoeff)
+			LiftCepstralCoeff[0]=logEnergy
+			return LiftCepstralCoeff 
         
         
         
