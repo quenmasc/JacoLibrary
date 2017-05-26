@@ -24,6 +24,7 @@ __version__="1.0-dev"
 class Speech_Recognition(object):
     """ Semaphore """
     MfccsCoeff=np.empty((39,150),'f')
+    audioData=np.array([])
     ClassLab=0
     """ Thread """ 
     def __init__(self):

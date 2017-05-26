@@ -9,7 +9,7 @@ import time
 import numpy.fft
 from scipy.signal import hilbert
 
-__author__="Quentin MASCRET <quentin.mascret.1 ulaval.ca>"
+__author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-04-14"
 __version__="1.0-dev"
 
@@ -22,6 +22,17 @@ def normalize(data,max_value) :
     data=fac * (data)#- biais )
     return data
 
+def DataNormalize (data):
+	meanData=np.mean(data)
+	DataMean=np.zeros((data.size))
+	for i in range(0,data.size):
+		DataMean[i]=data[i]-meanData
+	maxData=np.amax(np.absolute(DataMean))
+	NormalizeData=np.zeros((data.size))
+	for i in range(0,data.size):
+		NormalizeData[i]=DataMean[i]/maxData
+	return NormalizeData
+	
 def threshold(data):
     # return 'true' if below the 'silent' threshold
     data=np.array(data)

@@ -53,17 +53,31 @@ def FindWavFileAndStoreData():
             print "remaining" ,len(listdirectory)-i
     print tools.bcolors.OKGREEN +"all done" +tools.bcolors.ENDC
 
-def WAV2MFCCs(data,window_sample=200,window_shift=85):
-     data=DSP.normalize(data,32768.0)
-     buff=mfccbuffer.MFFCsRingBuffer()    
-     mfcc=MFCC.MFCCs()
-     nbFrame=(len(data)-window_sample)/window_shift
-     for i in range(0,nbFrame):
-	signal=np.array(data[(i*window_shift+np.arange(window_sample))])
-	m=mfcc.MFCC2(signal)
-	buff.extend2(m)
-     mfccs, fl=buff.get()
-     return mfccs
+def WAV2MFCCs(data,window_sample=200,window_shift=80):
+		data=DSP.normalize(data,32767.0)
+		buff=mfccbuffer.MFFCsRingBuffer()    
+		mfcc=MFCC.MFCCs()
+		nbFrame=(len(data)-window_sample)/window_shift
+		for i in range(0,nbFrame):
+			signal=np.array(data[(i*window_shift+np.arange(window_sample))])
+			m=mfcc.MFCC2(signal)
+			buff.extend2(m)
+		mfccs, fl=buff.get()
+		return mfccs
+
+def Data2MFCCs(data,window_sample=200,window_shift=85):
+		data=DSP.DataNormalize(data)
+		buff=mfccbuffer.MFFCsRingBuffer()    
+		mfcc=MFCC.MFCCs()
+		nbFrame=int((len(data)-window_sample)/window_shift)
+		for i in range(0,nbFrame):
+			signal=np.array(data[(i*window_shift+np.arange(window_sample))])
+			m=mfcc.MFCC2(signal)
+			buff.extend2(m)
+		mfccs, fl=buff.get()
+		return mfccs
+
+
 
 def ClassAttribution(endsfile):
     if fnmatch.fnmatch(endsfile,'*BACKWARD.wav' ):
@@ -257,11 +271,11 @@ def correl ():
             
             
 if __name__=='__main__' :
-  # FindWavFileAndStoreData()
+  FindWavFileAndStoreData()
 
  #correl()
-  test()
-  train()
+  #test()
+  #train()
    #model=LoadClassifier("SVM_Trained")
    #modelL=0 #LoadClassifier("LeftSVM_Trained")
   #modelR=0 #LoadClassifier("RightSVM_Trained")

@@ -63,27 +63,27 @@ class Sphere_calibration(object):
 			fo.close()
 			
 		elif (types == "test" ):	
-			#try :
-			#	fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
-			#except IOError :
-			#	print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
-			#	return
-			#try :
-			#	meanx=cPickle.load(fl)
-			#	meany=cPickle.load(fl)
-			#	meanz=cPickle.load(fl)
-			#	stdx=cPickle.load(fl)
-			#	stdy=cPickle.load(fl)
-			#	stdz=cPickle.load(fl)
-			#except :
-			#	fl.close()
-			#fl.close()
-			meanx=np.mean(x)
-			meany=np.mean(y)
-			meanz=np.mean(z) 
-			stdx=np.std(x)
-			stdy=np.std(y)
-			stdz=np.std(z)
+			try :
+				fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
+			except IOError :
+				print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
+				return
+			try :
+				meanx=cPickle.load(fl)
+				meany=cPickle.load(fl)
+				meanz=cPickle.load(fl)
+				stdx=cPickle.load(fl)
+				stdy=cPickle.load(fl)
+				stdz=cPickle.load(fl)
+			except :
+				fl.close()
+			fl.close()
+			#meanx=np.mean(x)
+			#meany=np.mean(y)
+			#meanz=np.mean(z) 
+			#stdx=np.std(x)
+			#stdy=np.std(y)
+			#stdz=np.std(z)
 		
 		# 0 mean and one std
 				## allocation of memory
