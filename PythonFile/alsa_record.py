@@ -187,7 +187,7 @@ if __name__=='__main__' :
     buff=mfccbuffer.MFFCsRingBuffer()
     RingLength=24650
     window_sample=200
-    step_sample=85
+    step_sample=80
 
    # store=RingBuffer.WaitingBuffer(10,window_sample)
     audio.run()
