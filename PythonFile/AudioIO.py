@@ -16,6 +16,7 @@ import tools
 import Sphere
 from scipy.stats import pearsonr
 import time
+import scipy.io
 
 __author__="Quentin MASCRET <quentin.mascret.1 ulaval.ca>"
 __date__="2017-05-03"
@@ -36,22 +37,48 @@ def ReadAudioFile(path):
 
         return (-1,-1)
 
-def FindWavFileAndStoreData():
-    i=0
 
-    os.chdir('speech/')
-    listdirectory = os.listdir(".")
-    for filename in listdirectory :
-        if filename.endswith(".wav"):
-            i+=1
-	    data=ReadAudioFile(filename)
-	    mfccs=WAV2MFCCs(data)
-            classLabel=ClassAttribution(filename)
-            struct=[classLabel,mfccs]
-            FeaturesSaved(struct)
-            print tools.bcolors.HEADER +"Features of", filename ," have been saved"  + tools.bcolors.ENDC
-            print "remaining" ,len(listdirectory)-i
-    print tools.bcolors.OKGREEN +"all done" +tools.bcolors.ENDC
+def ReadMatFile(path):
+	extension=os.path.splitext(path)[1]
+	if extension=='.mat':
+			mat=scipy.io.loadmat(path)
+			gender=mat['local_gender'][0][0]
+			features=mat['local_feature'][0]
+			classLabel=ClassAttributionMatFile(mat['local_classe'][0][0])
+			return  classLabel , features
+	else :
+			print "Error in ReadAudioFile() : NO FILE TYPE"
+
+			return (-1,-1)
+ 
+def ClassAttributionMatFile(endsfile):
+		return { 
+			1 :  'Class_1',
+			2 :  'Class_2' ,
+			3 :  'Class_3' ,
+			4 :  'Class_4' ,
+			5 :  'Class_5' ,
+			6 :  'Class_6' ,
+			7 :  'Class_7' ,
+			8 :  'Class_8' ,
+		}.get(endsfile) # zero is default class
+
+
+def FindWavFileAndStoreData():
+	i=0
+	os.chdir('mat/')
+	listdirectory = os.listdir(".")
+	for filename in listdirectory :
+		if filename.endswith(".mat"):
+			i+=1
+			classLabel,data=ReadMatFile(filename)
+	   # mfccs=WAV2MFCCs(data)
+			#	classLabel=ClassAttributionMatFile(filename)
+			struct=[classLabel,data] #mfccs
+			MatFileFeaturesSaved(struct)
+			print tools.bcolors.HEADER +"Features of", filename ," have been saved"  + tools.bcolors.ENDC
+			print "remaining" ,len(listdirectory)-i
+	print tools.bcolors.OKGREEN +"all done" +tools.bcolors.ENDC
 
 def WAV2MFCCs(data,window_sample=200,window_shift=80):
 		data=DSP.normalize(data,32767.0)
@@ -112,6 +139,21 @@ def FeaturesSaved(struct):
         data=np.vstack([data,struct[1]])
         np.savetxt(ClassDictionnaryFile(struct[0]),data)
     os.chdir('../speech')
+    
+def MatFileFeaturesSaved(struct):
+    os.chdir('../')
+    if not os.path.exists(struct[0]) :
+        os.makedirs(struct[0])
+        print tools.bcolors.OKBLUE +"folder :" ,struct[0], "has been created" + tools.bcolors.ENDC
+    os.chdir(struct[0])
+    if not os.path.isfile(ClassDictionnaryFile(struct[0])):
+        file(ClassDictionnaryFile(struct[0]),'a').close()
+        np.savetxt(ClassDictionnaryFile(struct[0]),struct[1])
+    else :
+			data=np.loadtxt(ClassDictionnaryFile(struct[0]))
+			data=np.vstack([data,struct[1]])
+			np.savetxt(ClassDictionnaryFile(struct[0]),data)
+    os.chdir('../mat')
 
 def ClassDictionnaryFile(className):
     return {

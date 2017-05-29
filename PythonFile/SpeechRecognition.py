@@ -39,7 +39,7 @@ class Speech_Recognition(object):
         
     def Recorder(self):
 
-        global MfccsCoeff
+        global MfccsCoeff  
         audio= alsa_record.Record()
 
         mfcc = MFCC.MFCCs()
@@ -48,8 +48,8 @@ class Speech_Recognition(object):
         RingLength=24650
         window_sample=200
         step_sample=85
+  
 
-   # store=RingBuffer.WaitingBuffer(10,window_sample)
 
         audio.run()
         i=0 
@@ -88,7 +88,7 @@ class Speech_Recognition(object):
             data, length = audio.read()
             pdata=audio.pseudonymize(data)
             ndata=DSP.normalize(pdata,32767.0)
-            audio.RingBufferWrite(function.LowPass(ndata))
+            audio.RingBufferWrite(ndata)
             if (c==[]) :
                 c=audio.RingBufferRead()
             else :
@@ -116,7 +116,7 @@ class Speech_Recognition(object):
                             entropyData=deque([])
                             for k in range(0,len(Data)) :
                                 entropyData.append(function.distance(Data[k],entropyNoise))
-                            entrrolpyThreshNoise =function.MeanStandardDeviation(entropyData,3)
+                            entropyThreshNoise =function.MeanStandardDeviation(entropyData,3)
                             print tools.bcolors.OKBLUE + "Recording is now allowed" +tools.bcolors.ENDC
                             n=deque([])
                             for i in range(0,20):
@@ -179,8 +179,9 @@ class Speech_Recognition(object):
 			
             self.__condition.wait()
             self.__semaphore.acquire()
-            newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeff,"test")).T
+            MfccsCoeffGet=MfccsCoeff
             self.__semaphore.release()
+            newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T
             classLab=AudioIO.ClassName(int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[0][0]))
             classL=int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[0][0])
             print(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[2][0])

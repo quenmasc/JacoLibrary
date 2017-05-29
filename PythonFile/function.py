@@ -42,7 +42,7 @@ def EntropyThresholdUpdate(entropyBuffer, lastThreshold, p) :
 
 def deltaMFCCs(MFCCs,w):
        hlen=int(np.floor(w/2))
-       win=np.linspace(4,-4,w)
+       win=np.linspace(4,-4,w) 
        x_b=mat.repmat(MFCCs[:,0],hlen,1).T
        x_e=mat.repmat(MFCCs[:,(MFCCs.size/len(MFCCs))-1],hlen,1).T 
        x_mfcc=np.array(MFCCs)

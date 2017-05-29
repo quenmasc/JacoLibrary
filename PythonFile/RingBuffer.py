@@ -57,21 +57,25 @@ class RingBuffer(object):
                 
     """ get data from ring buffer FIFO -> idea : get working window at each time"""
     def get(self):
-        idx=(self.__shift + np.arange(self.__window))
-        idx_clean=(self.__clean + np.arange(self.__step))
-        if self.__shift+self.__window > self.__length :
-            temp_end=(np.arange(self.__shift,self.__length))
-            temp_beg=(0+np.arange(self.__window-temp_end.size))
-            idx= np.concatenate([temp_end,temp_beg])
-        self.__shift+=self.__step
-        self.__clean+=self.__step
-        if self.__shift >= self.__length :
-            self.__shift=self.__shift-self.__length
-        if self.__clean >= self.__length :
-            self.__clean=self.__clean-self.__length
-        temp=self.__data[idx]
-        self.__data[idx_clean]=np.zeros(self.__step)
-        return temp
+		idx=(self.__shift + np.arange(self.__window))
+		idx_clean=(self.__clean + np.arange(self.__step))
+		if self.__shift+self.__window > self.__length :
+			temp_end=(np.arange(self.__shift,self.__length))
+			temp_beg=(0+np.arange(self.__window-temp_end.size))
+			idx= np.concatenate([temp_end,temp_beg])
+		if self.__clean+self.__step > self.__length :
+			clean_end=(np.arange(self.__clean,self.__length))
+			clean_beg=(0+np.arange(self.__step-clean_end.size))
+			idx_clean= np.concatenate([clean_end,clean_beg])
+		self.__shift+=self.__step
+		self.__clean+=self.__step
+		if self.__shift >= self.__length :
+				self.__shift=self.__shift-self.__length
+		if self.__clean >= self.__length :
+			self.__clean=self.__clean-self.__length
+		temp=self.__data[idx]
+		self.__data[idx_clean]=np.zeros(self.__step)
+		return temp
 
     def getSegments(self,tail):
         return_Index=(0+np.arange((self.__window+(tail-1)*self.__step)))
