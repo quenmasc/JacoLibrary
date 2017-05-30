@@ -16,6 +16,9 @@ import os
 import time
 import errno
 import Sphere
+import Limiter
+import SpectralSubstraction
+import math
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-05-11"
@@ -41,6 +44,7 @@ class Speech_Recognition(object):
 			global AudioData
 			audio= alsa_record.Record()
 			audio.run()
+			Limit=Limiter._Limiter()
 			i=0 
 			c=[]
         
@@ -49,13 +53,16 @@ class Speech_Recognition(object):
 					data, length = audio.read()
 					pdata=audio.pseudonymize(data)
 					ndata=DSP.normalize(pdata,32767.0)
-					audio.RingBufferWrite(ndata)
+					#LimitData=Limit.limit(ndata)
+					audio.RingBufferWrite(ndata)   # this line reduce rapidity of the program
 					if (c==[]) :
-						c=audio.RingBufferRead()
+						c=np.array(audio.RingBufferRead())
 					else :
 
 						print ("Overwrite")
 						break
+					
+					
 					self.__condition2.acquire()
 					self.__semaphore2.acquire()
 					AudioData=c
@@ -63,6 +70,7 @@ class Speech_Recognition(object):
 					self.__condition2.notify()
 					self.__condition2.release()
 					c=[]
+					#pdata=np.array(DSP.denormalize(LimitData,32767)).astype(int)
 					ndata=audio.depseudonymize(pdata)
 					audio.write(ndata)
 			print("out of loop")
@@ -127,6 +135,7 @@ class Speech_Recognition(object):
 			mfcc = MFCC.MFCCs()
 			entropy = spectral_entropy.SPECTRAL_ENTROPY()
 			buff=mfccbuffer.MFFCsRingBuffer()
+			SpectralSub=SpectralSubstraction.Spectral_Substraction()
 			j=0
 			fl="out"
 			count=0
@@ -148,6 +157,8 @@ class Speech_Recognition(object):
 
 			entropyThreshNoise=0l
 			entropyThresh = 0
+			### spectral substraction 
+			BackgroundNoise=deque([])
 			#audio 
 			audioData=[]
 			s=0
@@ -168,11 +179,25 @@ class Speech_Recognition(object):
 				else :
 						for i in range(0,2) :
 							# return MFCC and spectral entropy
+							
+							
+							### allow to delete this line  -- TEST TEST --- ####
+							if j>=100:
+								d=SpectralSub.Substraction(c[i])
+								for k in range (len(d)):
+									if math.isnan(d[k])==True :
+										c[i,k]=c[i,k]
+							 ### end of delete lines 
+							 
+							 
 							coeff,energy=mfcc.MFCC(np.array((c[i])))
 							SEntropy=entropy.SpectralEntropy(np.array((c[i])))
+							
 							if j<100 :
+								Noise=SpectralSub.STFT(c[i])
 								mfccNoise+=np.array(coeff)
 								entropyData.append(SEntropy)
+								BackgroundNoise.append(Noise)
 								j+=1
 								if j==100 :
 									mfccNoise=mfccNoise/100
@@ -188,7 +213,9 @@ class Speech_Recognition(object):
 										n.append(entropyData[79+i])
 									entropyData=deque([])
 									entropyData=n
+									SpectralSub.StoreParameter(BackgroundNoise)
 							else :
+								
 							# return MFCC and Spectral Entropy background noise
 								mfccN=function.updateMFCCsNoise(np.array(coeff),mfccNoise, 0.95)
 								entropyN=function.updateEntropyNoise(SEntropy,entropyNoise, 0.9)

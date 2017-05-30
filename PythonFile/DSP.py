@@ -22,16 +22,6 @@ def normalize(data,max_value) :
     data=fac * (data)#- biais )
     return data
 
-def DataNormalize (data):
-	meanData=np.mean(data)
-	DataMean=np.zeros((data.size))
-	for i in range(0,data.size):
-		DataMean[i]=data[i]-meanData
-	maxData=np.amax(np.absolute(DataMean))
-	NormalizeData=np.zeros((data.size))
-	for i in range(0,data.size):
-		NormalizeData[i]=DataMean[i]/maxData
-	return NormalizeData
 	
 def threshold(data):
     # return 'true' if below the 'silent' threshold
