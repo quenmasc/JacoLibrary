@@ -31,14 +31,19 @@ class Sphere_calibration(object):
 		
 			
 		self.__DataLength=int(features.size/features.shape[0])
-		self.__feature=np.zeros((39,self.__DataLength*150))
+		if types=="test" :
+			self.__prof=int((features.size/39))
+		elif types=="train" :
+			self.__prof=int((features.size/features.shape[1])/39)
+			
+		self.__feature=np.zeros((39,self.__DataLength*self.__prof))
 		if (types=="train"):
 			for i in range(0,self.__DataLength):
-				idx=(i*150+np.arange(150))
+				idx=(i*self.__prof+np.arange(self.__prof))
 			#idx_2=(i*1950+np.arange(1950))
-				self.__feature[:,idx]=np.reshape(features[:,i],(39,150), order='F')
+				self.__feature[:,idx]=np.reshape(features[:,i],(39,self.__prof), order='F')
 		elif (types=="test"):
-			self.__feature=np.reshape(features,(39,150), order='F')
+			self.__feature=np.reshape(features,(39,self.__prof), order='F')
 			#self.__Output[idx_2]=numpy.matlib.repmat(label,1,1950)
 		# reshape all matrix in 3 vector -> MFCC, VMFCC, VVMFCC
 		x=self.__feature[(0+np.arange(13)),:].reshape(self.__feature[(0+np.arange(13)),:].size, order='F')
@@ -63,33 +68,33 @@ class Sphere_calibration(object):
 			fo.close()
 			
 		elif (types == "test" ):	
-			try :
-				fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
-			except IOError :
-				print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
-				return
-			try :
-				meanx=cPickle.load(fl)
-				meany=cPickle.load(fl)
-				meanz=cPickle.load(fl)
-				stdx=cPickle.load(fl)
-				stdy=cPickle.load(fl)
-				stdz=cPickle.load(fl)
-			except :
-				fl.close()
-			fl.close()
-			#meanx=np.mean(x)
-			#meany=np.mean(y)
-			#meanz=np.mean(z) 
-			#stdx=np.std(x)
-			#stdy=np.std(y)
-			#stdz=np.std(z)
+			#try :
+			#	fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
+			#except IOError :
+			#	print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
+			#	return
+			#try :
+			#	meanx=cPickle.load(fl)
+			#	meany=cPickle.load(fl)
+			#	meanz=cPickle.load(fl)
+			#	stdx=cPickle.load(fl)
+			#	stdy=cPickle.load(fl)
+			#	stdz=cPickle.load(fl)
+			#except :
+			#	fl.close()
+			#fl.close()
+			meanx=np.mean(x)
+			meany=np.mean(y)
+			meanz=np.mean(z) 
+			stdx=np.std(x)
+			stdy=np.std(y)
+			stdz=np.std(z)
 		
 		# 0 mean and one std
 				## allocation of memory
-		new_x=np.zeros(self.__DataLength*150*13)
-		new_y=np.zeros(self.__DataLength*150*13)
-		new_z=np.zeros(self.__DataLength*150*13)
+		new_x=np.zeros(self.__DataLength*self.__prof*13)
+		new_y=np.zeros(self.__DataLength*self.__prof*13)
+		new_z=np.zeros(self.__DataLength*self.__prof*13)
 				## operation
 		for i in range(0,x.size):
 			if x[i] != 0:
@@ -102,7 +107,7 @@ class Sphere_calibration(object):
 				new_z[i]=0
 		# Paramter to create sphere with dataset
 				## allocation of memory
-		P_abs=np.zeros(self.__DataLength*150*13)
+		P_abs=np.zeros(self.__DataLength*self.__prof*13)
 				## operation
 		P=(np.vstack((new_x,new_y,new_z))).T
 		for i in range(0, x.size):
@@ -115,14 +120,14 @@ class Sphere_calibration(object):
 				Q[i]=0
 		# Sphere data
 				## allocation of memory
-		SphereData=np.zeros((self.__DataLength*150*13,3))
+		SphereData=np.zeros((self.__DataLength*self.__prof*13,3))
 		for i in range(0,3):
 			SphereData[:,i]=Q*P[:,i]
 		for i in range (0,3):
-			for j in range(0,self.__DataLength*150*13):
+			for j in range(0,self.__DataLength*self.__prof*13):
 				if math.isnan(SphereData[j,i])==True :
 					SphereData[j,i]=0
-		feat_struct=np.concatenate((SphereData[:,0].reshape(13,150*self.__DataLength,order='F'),SphereData[:,1].reshape(13,150*self.__DataLength,order='F'),SphereData[:,2].reshape(13,150*self.__DataLength,order='F')),axis=0)
+		feat_struct=np.concatenate((SphereData[:,0].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,1].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,2].reshape(13,self.__prof*self.__DataLength,order='F')),axis=0)
 		## plot 3D
 		#fig=plt.figure()
 		#ax=fig.add_subplot(111,projection='3d')
@@ -137,9 +142,9 @@ class Sphere_calibration(object):
 		#plt.show()
 		# return features matrix
 				## allocation of memory
-		features=np.zeros((39*150,self.__DataLength))
+		features=np.zeros((39*self.__prof,self.__DataLength))
 		for i in range (0,self.__DataLength):
-			intermediaire=feat_struct[:,(i*150+np.arange(150))]
+			intermediaire=feat_struct[:,(i*self.__prof+np.arange(self.__prof))]
 			features[:,i]=intermediaire.reshape(intermediaire.size, order='F')
 		print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ..." + tools.bcolors.ENDC
 					

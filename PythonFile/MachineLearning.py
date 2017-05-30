@@ -51,9 +51,9 @@ def NormalizeFeatures(features):
 
 def C_Gamma(index):
 	return { 
-		1 : param_grid=dict(estimator__gamma=np.logspace(-6,-2,40), estimator__C=np.logspace(-1,3,40)),
-		2 : param_grid=dict(estimator__gamma=np.logspace(-12,-4,40), estimator__C=np.logspace(-6,0,40));
-		3 : param_grid=dict(estimator__gamma=np.logspace(-12,-3,40), estimator__C=np.logspace(0,20)),
+		1 : dict(estimator__gamma=np.logspace(-6,-2,40), estimator__C=np.logspace(-1,3,40)),
+		2 : dict(estimator__gamma=np.logspace(-12,-4,40), estimator__C=np.logspace(-6,0,40)),
+		3 : dict(estimator__gamma=np.logspace(-12,-3,40), estimator__C=np.logspace(0,20)),
         }.get(index) # zero is default class
         
 def TrainSVM_RBF_Features(features,classLabel,index):

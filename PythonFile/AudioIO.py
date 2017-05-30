@@ -177,7 +177,7 @@ def FolderClassDictionnary(listOfDirs):
         'Class_6' : 6,
         'Class_7' : 7,
         'Class_8' : 8,
-        }.get(listOfDirs,8) # zero is default class
+        }.get(listOfDirs,0) # zero is default class
 
 def ClassName(Label):
      return { 
@@ -205,8 +205,8 @@ def FistSVMClass(listOfDirs):
 def ReadFeatureClass():
     listdirectory = os.listdir(".")
     Normalization=Sphere.Sphere_calibration()
-    Features=np.array([]).reshape(5850,0)
-    FeaturesLeft=np.array([]).reshape(5850,0)
+    Features=np.array([]).reshape(3900,0)
+    FeaturesLeft=np.array([]).reshape(3900,0)
     FeaturesRight=np.array([]).reshape(3120,0)
     ClassNormal=np.array([]).reshape(1,0)
     ClassLeft=np.array([]).reshape(1,0)
@@ -316,7 +316,7 @@ def correl ():
             
             
 if __name__=='__main__' :
-  FindWavFileAndStoreData()
+  #FindWavFileAndStoreData()
 
  #correl()
 	test()
