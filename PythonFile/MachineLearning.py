@@ -16,6 +16,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.cross_validation import train_test_split
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.cross_validation import StratifiedKFold
+from sklearn.multiclass import OneVsRestClassifier
 import tools
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
@@ -39,7 +40,7 @@ def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
     return R1 , R2 , P1 , P2
 
 def TrainBestParams(params,features,classLabel):
-    svm=sklearn.svm.SVC(probability=True,**params)
+    svm=OneVsRestClassifier(SVC(probability=True,**params))
     svm.fit(features,classLabel)
     return svm
 
@@ -47,24 +48,26 @@ def NormalizeFeatures(features):
         # features matrix need to be a matrix with n rows coefficient per k colunm data
      print "normalization"
 
-def TrainSVM_RBF_Features(features,classLabel):
 
-    # splt features into class test and train
-   # featuresTrain,featuresTest ,classTrain, ClassTest = MachineLearning.Splitfeatures(features.T,classL.T,0.9)
+def C_Gamma(index):
+	return { 
+		1 : param_grid=dict(estimator__gamma=np.logspace(-6,-2,40), estimator__C=np.logspace(-1,3,40)),
+		2 : param_grid=dict(estimator__gamma=np.logspace(-12,-4,40), estimator__C=np.logspace(-6,0,40));
+		3 : param_grid=dict(estimator__gamma=np.logspace(-12,-3,40), estimator__C=np.logspace(0,20)),
+        }.get(index) # zero is default class
+        
+def TrainSVM_RBF_Features(features,classLabel,index):
 
-    # C and Gamma range
-    C= np.logspace(-6,3,20) #20
-    Gamma=np.logspace(-9,3,20)#20
 
     # paramgrid
-    param_grid=dict(gamma=Gamma, C=C)
+    param_grid=C_Gamma(index)
 
     # cv
-    cv = StratifiedShuffleSplit(classLabel,n_iter=10 , test_size=0.1, train_size=0.9,random_state=42)
+    cv = StratifiedShuffleSplit(classLabel,n_iter=10 , test_size=0.2, train_size=0.8,random_state=42)
 
     # grid
     print tools.bcolors.OKBLUE + "Running ..." + tools.bcolors.ENDC
-    grid =GridSearchCV(SVC(),param_grid=param_grid,cv=cv,verbose=40,n_jobs=2) # k=17 StratifiedKFold(classLabel,k=17)
+    grid =GridSearchCV(OneVsRestClassifier(SVC(kernel="rbf")),param_grid=param_grid,cv=cv,verbose=40,n_jobs=2) # k=17 StratifiedKFold(classLabel,k=17)
     grid.fit(features,classLabel)
     return grid
     

@@ -177,7 +177,7 @@ def FolderClassDictionnary(listOfDirs):
         'Class_6' : 6,
         'Class_7' : 7,
         'Class_8' : 8,
-        }.get(listOfDirs,0) # zero is default class
+        }.get(listOfDirs,8) # zero is default class
 
 def ClassName(Label):
      return { 
@@ -200,7 +200,7 @@ def FistSVMClass(listOfDirs):
         'Class_6' : 2,
         'Class_7' : 1,
         'Class_8' : 3,
-        }.get(listOfDirs,0) # zero is default class
+        }.get(listOfDirs,3) # three is default class
 
 def ReadFeatureClass():
     listdirectory = os.listdir(".")
@@ -254,16 +254,16 @@ def test():
         print tools.bcolors.FAIL+ "In Classifier - Error : folders are empty"+tools.bcolors.ENDC
         return
     print tools.bcolors.HEADER +"Size of features :" , featuresL.shape , len(classL), featuresR.shape , len(classR),features.shape , len(ClassFistLevel) , "Features, FeaturesL , FeaturesR" + tools.bcolors.ENDC
-    FistSvmModel=MachineLearning.TrainSVM_RBF_Features(features.T, CN)#ClassFistLevel
+    FistSvmModel=MachineLearning.TrainSVM_RBF_Features(features.T, ClassFistLevel,1)#ClassFistLevel
     SaveClassifier("SVM",FistSvmModel)
-  #  print tools.bcolors.HEADER + "First SVM saved" + tools.bcolors.ENDC
- #   SecondSvmModel=MachineLearning.TrainSVM_RBF_Features(featuresL.T, classL)
-  #  SaveClassifier("LeftSVM",SecondSvmModel)
- #   print tools.bcolors.HEADER + "Second SVM saved" + tools.bcolors.ENDC
- #   ThirdSvmModel=MachineLearning.TrainSVM_RBF_Features(featuresR.T, classR)
-  #  SaveClassifier("RightSVM",ThirdSvmModel)
-  #  print tools.bcolors.HEADER + "Third SVM saved" + tools.bcolors.ENDC
-  #  print tools.bcolors.OKGREEN + "All classifiers have been saved" +tools.bcolors.ENDC
+    print tools.bcolors.HEADER + "First SVM saved" + tools.bcolors.ENDC
+    SecondSvmModel=MachineLearning.TrainSVM_RBF_Features(featuresL.T, classL,2)
+    SaveClassifier("LeftSVM",SecondSvmModel)
+    print tools.bcolors.HEADER + "Second SVM saved" + tools.bcolors.ENDC
+    ThirdSvmModel=MachineLearning.TrainSVM_RBF_Features(featuresR.T, classR,3)
+    SaveClassifier("RightSVM",ThirdSvmModel)
+    print tools.bcolors.HEADER + "Third SVM saved" + tools.bcolors.ENDC
+    print tools.bcolors.OKGREEN + "All classifiers have been saved" +tools.bcolors.ENDC
     
 def train():
     [features, featuresL, featuresR, classL, classR,ClassFistLevel, CN]=ReadFeatureClass()
@@ -271,21 +271,24 @@ def train():
         print tools.bcolors.FAIL + "In Classifier - Error : folders are empty"+tools.bcolors.ENDC
         return
     model=LoadClassifier("SVM")
-  #  modelL=LoadClassifier("LeftSVM")
-  #  modelR=LoadClassifier("RightSVM")
-    SVM=MachineLearning.TrainBestParams(model.best_params_,features.T,CN)#ClassFistLevel
+    modelL=LoadClassifier("LeftSVM")
+    modelR=LoadClassifier("RightSVM")
+    params=dict(gamma=model.best_params_["estimator_gamma"],C=model.best_params_["estimator_C"])
+    SVM=MachineLearning.TrainBestParams(params,features.T,ClassFistLevel)#ClassFistLevel
     print tools.bcolors.HEADER + "First SVM Trained" + tools.bcolors.ENDC
-#    SVML=MachineLearning.TrainBestParams(modelL.best_params_,featuresL.T,classL)
- #   print tools.bcolors.HEADER + "Left SVM Trained" + tools.bcolors.ENDC
- #   SVMR=MachineLearning.TrainBestParams(modelR.best_params_,featuresR.T,classR)
- #   print tools.bcolors.HEADER + "Right SVM Trained" + tools.bcolors.ENDC
+    paramsL=dict(gamma=modelL.best_params_["estimator_gamma"],C=modelL.best_params_["estimator_C"])
+    SVML=MachineLearning.TrainBestParams(paramsL,featuresL.T,classL)
+    print tools.bcolors.HEADER + "Left SVM Trained" + tools.bcolors.ENDC
+    paramsR=dict(gamma=modelR.best_params_["estimator_gamma"],C=modelR.best_params_["estimator_C"])
+    SVMR=MachineLearning.TrainBestParams(modelR.best_params_,featuresR.T,classR)
+    print tools.bcolors.HEADER + "Right SVM Trained" + tools.bcolors.ENDC
     print tools.bcolors.OKGREEN + "All SVM Trained correctly -> next step save them" + tools.bcolors.ENDC
     SaveClassifier("SVM_Trained",SVM)
     print tools.bcolors.HEADER + " SVM Trained saved" + tools.bcolors.ENDC
-#    SaveClassifier("LeftSVM_Trained",SVML)
-#    print tools.bcolors.HEADER + " Left SVM Trained saved" + tools.bcolors.ENDC
- #   SaveClassifier("RightSVM_Trained",SVMR)
- #   print tools.bcolors.HEADER + "Right SVM Trained saved" + tools.bcolors.ENDC
+    SaveClassifier("LeftSVM_Trained",SVML)
+    print tools.bcolors.HEADER + " Left SVM Trained saved" + tools.bcolors.ENDC
+    SaveClassifier("RightSVM_Trained",SVMR)
+    print tools.bcolors.HEADER + "Right SVM Trained saved" + tools.bcolors.ENDC
     print tools.bcolors.OKGREEN + "All SVM Trained have been saved" + tools.bcolors.ENDC
  
  
@@ -316,8 +319,8 @@ if __name__=='__main__' :
   FindWavFileAndStoreData()
 
  #correl()
-  #test()
-  #train()
+	test()
+	train()
    #model=LoadClassifier("SVM_Trained")
    #modelL=0 #LoadClassifier("LeftSVM_Trained")
   #modelR=0 #LoadClassifier("RightSVM_Trained")
