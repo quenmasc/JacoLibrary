@@ -20,8 +20,9 @@ __version__="1.0-dev"
 class MFFCsRingBuffer(object):
         """ Initialize the ring buffer"""
         def __init__(self):
-            self.__data=np.zeros(1950)
-            self.__length=1950
+            self.__data=np.zeros(2600)
+            self.__length=2600
+            self.__lengthMax=1300
             self.__index=0
             self.__tail=0
             self.__count=0
@@ -30,7 +31,7 @@ class MFFCsRingBuffer(object):
             self.__numberOfWindowRejection=20 # 1600 samples -> need to modify it eventually
             self.__lengthOfWindowMinima=150 # need to adapt this value 10*13
             self.__EnergyCoeffArray=np.empty(13,'f')
-            self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,85)
+            self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
             self.__previous_amplitude_envelope=0.
                 
         def extend(self,data):
@@ -54,6 +55,8 @@ class MFFCsRingBuffer(object):
         
         def get(self):
                 #new version #
+                if self.__tail >= self.__lengthMax:
+					self.__tail=self.__lengthMax
                 idx=(0+np.arange(self.__tail))
                 temp=np.array(self.__data[idx])
                 ######### NEW add 2017.05.11 #####
@@ -71,12 +74,12 @@ class MFFCsRingBuffer(object):
               #  deltaDelta=function.deltaMFCCs(delta,9)
               #  mfccs=np.concatenate((temp,delta,deltaDelta),axis=0)
               #  np.savetxt('mfcc.out',mfccs)
-                self.__data=np.zeros(1950)
+                self.__data=np.zeros(2600)
                 self.__index=0
                 self.__tail=0
                 self.__out="out"
         #       print "tail :" ,self.__tail , "new value ;" , self.__tail/13 
-                return np.concatenate((mfccs_reshape,np.zeros(self.__length*3-mfccs_reshape.size)),axis=0),self.__SampleRingBuffer.getSegments(len(idx)/13)
+                return np.concatenate((mfccs_reshape,np.zeros(self.__lengthMax*3-mfccs_reshape.size)),axis=0),self.__SampleRingBuffer.getSegments(len(idx)/13)
 
         def flag(self,data,threshold,entropyDistance,entropyThresh,coeff,energy, AudioSample):
                 # first case
@@ -127,7 +130,7 @@ class MFFCsRingBuffer(object):
                 if self.__flag=="done" :
                         if self.__tail< self.__lengthOfWindowMinima :
                                 self.__flag="rejeted"
-                                self.__data=np.zeros(1950)
+                                self.__data=np.zeros(2600)
                         else :
                                 self.__flag="admit"
 				

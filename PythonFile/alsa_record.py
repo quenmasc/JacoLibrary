@@ -100,7 +100,7 @@ class Record(object) :
        # index=Queue()
         RingLength=24650
         window_sample=200
-        step_sample=85
+        step_sample=80
         self.__read_process = Process(target=self.__read)
         self.__write_process = Process(target = self.__write)
         ring=RingBuffer.RingBuffer(RingLength,window_sample,step_sample)

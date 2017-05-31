@@ -273,14 +273,17 @@ def train():
     model=LoadClassifier("SVM")
     modelL=LoadClassifier("LeftSVM")
     modelR=LoadClassifier("RightSVM")
-    params=dict(gamma=model.best_params_["estimator_gamma"],C=model.best_params_["estimator_C"])
+    params=dict(gamma=model.best_params_["estimator__gamma"],C=model.best_params_["estimator__C"])
+    print params
     SVM=MachineLearning.TrainBestParams(params,features.T,ClassFistLevel)#ClassFistLevel
     print tools.bcolors.HEADER + "First SVM Trained" + tools.bcolors.ENDC
-    paramsL=dict(gamma=modelL.best_params_["estimator_gamma"],C=modelL.best_params_["estimator_C"])
+    paramsL=dict(gamma=modelL.best_params_["estimator__gamma"],C=modelL.best_params_["estimator__C"])
+    print paramsL
     SVML=MachineLearning.TrainBestParams(paramsL,featuresL.T,classL)
     print tools.bcolors.HEADER + "Left SVM Trained" + tools.bcolors.ENDC
-    paramsR=dict(gamma=modelR.best_params_["estimator_gamma"],C=modelR.best_params_["estimator_C"])
-    SVMR=MachineLearning.TrainBestParams(modelR.best_params_,featuresR.T,classR)
+    paramsR=dict(gamma=modelR.best_params_["estimator__gamma"],C=modelR.best_params_["estimator__C"])
+    print modelR.best_params_
+    SVMR=MachineLearning.TrainBestParams(paramsR,featuresR.T,classR)
     print tools.bcolors.HEADER + "Right SVM Trained" + tools.bcolors.ENDC
     print tools.bcolors.OKGREEN + "All SVM Trained correctly -> next step save them" + tools.bcolors.ENDC
     SaveClassifier("SVM_Trained",SVM)
@@ -319,7 +322,7 @@ if __name__=='__main__' :
   #FindWavFileAndStoreData()
 
  #correl()
-	test()
+	#test()
 	train()
    #model=LoadClassifier("SVM_Trained")
    #modelL=0 #LoadClassifier("LeftSVM_Trained")

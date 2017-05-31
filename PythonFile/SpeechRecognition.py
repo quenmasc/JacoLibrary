@@ -37,7 +37,6 @@ class Speech_Recognition(object):
 			self.__condition=threading.Condition()
 			self.__semaphore2=threading.BoundedSemaphore(self.__maxconnections)
 			self.__condition2=threading.Condition()
-			self.__svm=AudioIO.LoadClassifier("SVM_Trained")
 			self.__fifo_name= 'fifo'
            
 		def Recorder(self):
@@ -78,6 +77,9 @@ class Speech_Recognition(object):
       
 		def SVM(self):
 			global MfccsCoeff
+			self.__svm=AudioIO.LoadClassifier("SVM_Trained")
+			self.__svmL=AudioIO.LoadClassifier("LeftSVM_Trained")
+			self.__svmR=AudioIO.LoadClassifier("RightSVM_Trained")
 			CoeffSphere=Sphere.Sphere_calibration();
 			try :
 				os.remove('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name)
@@ -102,9 +104,9 @@ class Speech_Recognition(object):
 					self.__semaphore.release()
 					self.__condition.release()
 					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T
-					classLab=AudioIO.ClassName(int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[0][0]))
-					classL=int(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[0][0])
-					print(MachineLearning.ClassifierWrapper(self.__svm, 0, 0,newcoeff)[2][0])
+					classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
+					classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[0][0])
+					#print(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[2][0])
 					print classLab
 					self.write_Pipe(classL)
 				         
@@ -173,10 +175,11 @@ class Speech_Recognition(object):
 				c=AudioData
 				self.__semaphore2.release()
 				self.__condition2.release()
-				if flag < 3:
+				if flag < 2:
 						flag+=1
 
 				else :
+						pool = Pool(processes=2)
 						for i in range(0,2) :
 							# return MFCC and spectral entropy
 							
@@ -240,6 +243,7 @@ class Speech_Recognition(object):
 									self.__condition.notify()
 									self.__condition.release()
 									self.__semaphore.release()
+						pool.close()			
 
 				c=[]     
     
