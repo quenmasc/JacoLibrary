@@ -27,22 +27,22 @@ class Record(object) :
     """Initialize audio buffer"""
     def __init__(self):
         # all queues
-        self.__read_queue = Queue()
-        self.__read_frame = Queue()
-        self.__write_queue=Queue()
-        self.__RingBufferWrite_queue=Queue()
-        self.__RingBufferRead_queue=Queue()
+			self.__read_queue = Queue()
+			self.__read_frame = Queue()
+			self.__write_queue=Queue()
+			self.__RingBufferWrite_queue=Queue()
+			self.__RingBufferRead_queue=Queue()
 	# params  
-	self.__format=alsa.PCM_FORMAT_S16_LE # format of sample 
-	self.__byte =4 # size of each sample 
-	self.__rate=8000 # sample rate
-        self.__channels=1 # number of channel use in record
-	self.__max=48000 # length max of ring buffer for float values
+			self.__format=alsa.PCM_FORMAT_S16_LE # format of sample 
+			self.__byte =4 # size of each sample 
+			self.__rate=8000 # sample rate
+			self.__channels=1 # number of channel use in record
+			self.__max=48000 # length max of ring buffer for float values
 	# change some parameters in terms of sample rate 
-	if self.__format==alsa.PCM_FORMAT_S16_LE :
-		self.__mgax=self.__max/2
-		self.__byte=self.__byte/2
-		self.__push_value=[self.__max/3, 2*self.__max/3,self.__max]
+			if self.__format==alsa.PCM_FORMAT_S16_LE :
+				self.__mgax=self.__max/2
+				self.__byte=self.__byte/2
+				self.__push_value=[self.__max/3, 2*self.__max/3,self.__max]
        # self.__raw_data=[None for i in xrange(self.__max)]
 
 

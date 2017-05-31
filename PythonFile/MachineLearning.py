@@ -31,13 +31,13 @@ def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
     R2=-1
     P2=-1
     R1=classifier.predict(Vector)
-    P1=classifier.predict_proba(Vector)
+    #P1=classifier.predict_proba(Vector)
     if R1 == 1 :
 		R2=classifierL.predict(Vector)
-		P2=classifierL.predict_proba(Vector)
+		#P2=classifierL.predict_proba(Vector)
     elif R1 == 2 :
-        R2=classifierR.predict(Vector[0][(0+np.arange(3120))]).reshape(1,-1)
-        P2=classifierR.predict_proba(Vector[0][(0+np.arange(3120))]).reshape(1,-1)
+        R2=classifierR.predict((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
+       # P2=classifierR.predict_proba((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
     return R1 , R2 , P1 , P2
 
 def TrainBestParams(params,features,classLabel):

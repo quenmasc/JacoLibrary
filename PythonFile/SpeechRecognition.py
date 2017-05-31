@@ -179,7 +179,7 @@ class Speech_Recognition(object):
 						flag+=1
 
 				else :
-						pool = Pool(processes=2)
+						#pool = Pool(processes=2)
 						for i in range(0,2) :
 							# return MFCC and spectral entropy
 							
@@ -243,7 +243,7 @@ class Speech_Recognition(object):
 									self.__condition.notify()
 									self.__condition.release()
 									self.__semaphore.release()
-						pool.close()			
+						#pool.close()			
 
 				c=[]     
     
