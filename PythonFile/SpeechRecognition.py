@@ -19,7 +19,8 @@ import Sphere
 import Limiter
 import SpectralSubstraction
 import math
-
+import wave
+import struct
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-05-11"
 __version__="1.0-dev"
@@ -29,6 +30,7 @@ class Speech_Recognition(object):
 		MfccsCoeff=np.empty((39,150),'f')
 		audioData=np.array([])
 		AudioData=np.array([])
+		Data=np.array([])
 		ClassLab=0
 		""" Thread """ 
 		def __init__(self):
@@ -46,32 +48,42 @@ class Speech_Recognition(object):
 			Limit=Limiter._Limiter()
 			i=0 
 			c=[]
-        
+			flag=False
 
 			while True :
 					data, length = audio.read()
 					pdata=audio.pseudonymize(data)
 					ndata=DSP.normalize(pdata,32767.0)
-					#LimitData=Limit.limit(ndata)
-					audio.RingBufferWrite(ndata)   # this line reduce rapidity of the program
-					if (c==[]) :
-						c=np.array(audio.RingBufferRead())
+					if (Limit.limit(ndata)==1 and flag==False):
+						audio.runBuffer()
+						flag=True
+					elif (Limit.limit(ndata)==0 and flag==True) :
+						audio.StopBuffer()
+						flag=False
+					elif (Limit.limit(ndata)==1 and flag==True):
+						flag=True
 					else :
+						flag=False
+					if (flag==True):
+						#print "Acquire"
+						audio.RingBufferWrite(ndata)   # this line reduce rapidity of the program
+						if (c==[]) :
+							c=np.array(audio.RingBufferRead())
+						else :
 
-						print ("Overwrite")
-						break
+							print ("Overwrite")
+							return
 					
 					
-					self.__condition2.acquire()
-					self.__semaphore2.acquire()
-					AudioData=c
-					self.__semaphore2.release()
-					self.__condition2.notify()
-					self.__condition2.release()
-					c=[]
-					#pdata=np.array(DSP.denormalize(LimitData,32767)).astype(int)
-					ndata=audio.depseudonymize(pdata)
-					audio.write(ndata)
+						self.__condition2.acquire()
+						self.__semaphore2.acquire()
+						AudioData=c
+						self.__semaphore2.release()
+						self.__condition2.notify()
+						self.__condition2.release()
+						c=[]
+					#ndata=audio.depseudonymize(pdata)
+					#audio.write(ndata)
 			print("out of loop")
 			print("end of transmission -> wait")
       
@@ -97,17 +109,22 @@ class Speech_Recognition(object):
         
         
 			while True :
-					self.__condition.acquire()
-					self.__condition.wait()
-					self.__semaphore.acquire()
-					MfccsCoeffGet=MfccsCoeff
-					self.__semaphore.release()
-					self.__condition.release()
-					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T
-					classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
-					classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[0][0])
-					print classLab
-					self.write_Pipe(classL)
+						self.__condition.acquire()
+						self.__condition.wait()
+						self.__semaphore.acquire()
+						MfccsCoeffGet=MfccsCoeff
+						self.__semaphore.release()
+						self.__condition.release()
+						newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T
+						classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
+						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[0][0])
+						print classLab
+						self.write_Pipe(classL)
+						#file=wave.open('test.wav','wb')
+						#file.setparams((1,2,8000,len(AudioData),"NONE","not compressed"))
+						#file.writeframes(self.depseudonymize(np.array(DSP.denormalize(Audio,32767.)).astype(int)))
+						#file.close()
+						#print "Done ..."
 				         
 		def write_Pipe(self,classL):
 			with open(self.__fifo_name,'wb') as f:
@@ -232,13 +249,14 @@ class Speech_Recognition(object):
 							# update threshold 
 
 								th[i]=function.sigmoid(10,5,corr)
-								entropyThresh=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.8)
+								entropyThresh=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.95)
 
 								fl=buff.flag(corr,th[i],entropyDistance,entropyThresh,coeff,energy,np.array(c[i]))
 								if fl=="admit" :
 									self.__semaphore.acquire()
 									self.__condition.acquire()
-									MfccsCoeff,audioData=buff.get()
+									print "Put data"
+									MfccsCoeff,Data=buff.get()
 									self.__condition.notify()
 									self.__condition.release()
 									self.__semaphore.release()
@@ -246,6 +264,12 @@ class Speech_Recognition(object):
 
 				c=[]     
     
+
+		def depseudonymize(self, a):
+			s = ""
+			for elem in a:
+				s += struct.pack('h', elem)
+			return s
     
 if __name__=='__main__' :
     print "Running ...."

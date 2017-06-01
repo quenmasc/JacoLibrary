@@ -42,8 +42,6 @@ def EndSegments(cond,previous_amplitude_envelope,currIndex,tail, AudioSample):
     return cond, currTail , current_amplitude_envelope
 
 
-
-    
 def logEnergy(frame):
     nfft=256 # the nextpow of 200 samples
     fft = numpy.fft.rfft(frame, nfft)

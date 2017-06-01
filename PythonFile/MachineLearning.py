@@ -27,17 +27,17 @@ __version__="1.0-dev"
 
 
 def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
-    R1=-1
-    P1=-1
-    R1=classifier.predict(Vector)
+		R1=-1
+		P1=-1
+		R1=classifier.predict(Vector)
    # P1=classifier.predict_proba(Vector)
-    if R1 == 1 :
-		R2=classifierL.predict(Vector)
+		if R1 == 1 :
+			R2=classifierL.predict(Vector)
 		#P2=classifierL.predict_proba(Vector)
-    elif R1 == 2 :
-        R2=classifierR.predict((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
+		elif R1 == 2 :
+			R2=classifierR.predict((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
        # P2=classifierR.predict_proba((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
-    return R1 , R2 
+		return R1 , R2 
 
 def TrainBestParams(params,features,classLabel):
     svm=OneVsRestClassifier(SVC(probability=True, **params))

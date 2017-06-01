@@ -18,17 +18,11 @@ __version__="1.0-dev"
 
 class Sphere_calibration(object):
 	def __init__(self):
-		self.__rayon=1
+		self.__rayon=1.0
 		self.__center=np.array([0,0,0])
 	
-	def Length(self, features):
-		self.__DataLength=int(features.size/features.shape[0])
-		self.__feature=np.zeros((39,self.__DataLength*150))
-		#self.__Output=np.zeros(features.shape[1]*1950) # 13 * 150
-		#return DataLength , feature, Output
 		
 	def ClassAndFeaturesSplit(self, features,types):
-		#self.Length(features)
 		
 			
 		self.__DataLength=int(features.size/features.shape[0])

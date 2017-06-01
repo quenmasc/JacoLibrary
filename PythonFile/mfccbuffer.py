@@ -28,7 +28,7 @@ class MFFCsRingBuffer(object):
             self.__count=0
             self.__cond=0# condition in EndSegments
             self.__flag="out"
-            self.__numberOfWindowRejection=50 # 1600 samples -> need to modify it eventually
+            self.__numberOfWindowRejection=30 # 1600 samples -> need to modify it eventually
             self.__lengthOfWindowMinima=260 # need to adapt this value 10*13
             self.__EnergyCoeffArray=np.empty(13,'f')
             self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
@@ -59,21 +59,11 @@ class MFFCsRingBuffer(object):
 					print "Length of segments is :" , self.__tail/13
 					idx=(0+np.arange(self.__tail))
 					temp=np.array(self.__data[idx])
-                ######### NEW add 2017.05.11 #####
-				# comment 20 05 2017 MFCCsN=DSP.FeatureNormalization(temp)
 					MFCCs=temp.reshape((len(idx)/13),13).T
-                ######### END NEW add ####### NORMALIZATION ####
 					delta=function.deltaMFCCs(MFCCs,9)
 					deltaDelta=function.deltaMFCCs(delta,9)
 					mfccs=np.concatenate((MFCCs,delta,deltaDelta),axis=0)
 					mfccs_reshape=mfccs.reshape(mfccs.size,order='F')
-                
-                ####### old version ######
-              #  temp=np.array(self.__data).reshape((150,13)).T
-              #  delta=function.deltaMFCCs(temp,9)
-              #  deltaDelta=function.deltaMFCCs(delta,9)
-              #  mfccs=np.concatenate((temp,delta,deltaDelta),axis=0)
-              #  np.savetxt('mfcc.out',mfccs)
 					self.__data=np.zeros(2600)
 					self.__index=0
 					self.__tail=0
@@ -90,12 +80,12 @@ class MFFCsRingBuffer(object):
                         self.__flag="out"
                         
                 if (data>=threshold and entropyDistance>=entropyThresh) and self.__flag=="out" :
-                        self.__flag="in"
-                        self.__SampleRingBuffer.initialize()
+							self.__flag="in"
+							self.__SampleRingBuffer.initialize()
                         
                 if (data<threshold and entropyDistance<entropyThresh) and self.__flag=="in" :
-                        self.__flag="io"
-
+							self.__flag="io"
+	
                 if (data>=threshold and entropyDistance>=entropyThresh) and self.__flag=="io" :
                         self.__flag="in"
 
