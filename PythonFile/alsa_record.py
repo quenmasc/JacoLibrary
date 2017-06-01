@@ -118,7 +118,8 @@ class Record(object) :
 		def StopBuffer(self):
 				print "Data Collector is stopped"
 				self.__RingBuffer_write_process.terminate()
-				self.__RingBuffer_write_process.join()
+				self.__RingBufferWrite_queue=Queue()
+				self.__RingBufferRead_queue=Queue()
         
 		def read(self):
 				return self.__read_queue.get() , self.__read_frame.get()     
@@ -153,7 +154,8 @@ class Record(object) :
 							temp.append(ring.get().tolist())
 					else :
 						flag+=1
-						temp=np.zeros(400)
+						temp=0.01*np.ones((2,200))
+							
 					self.__RingBufferRead_queue.put(temp)
 					temp=[]
 

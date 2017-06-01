@@ -36,9 +36,9 @@ class _Limiter(object):
 					elif(self.__enveloppe >=self.__threshold and self.__Timer!=0):
 						self.__Timer=0
 						
-					elif (self.__enveloppe < self.__threshold and self.__Timer<=400 and self.__Timer !=0):
+					elif (self.__enveloppe < self.__threshold and self.__Timer<=200 and self.__Timer !=0):
 						self.__Timer+=1
-					elif (self.__enveloppe < self.__threshold and self.__Timer > 400) :
+					elif (self.__enveloppe < self.__threshold and self.__Timer > 200) :
 						self.__evolve=0
 					return self.__evolve
 						
