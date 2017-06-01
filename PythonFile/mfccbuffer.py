@@ -28,8 +28,8 @@ class MFFCsRingBuffer(object):
             self.__count=0
             self.__cond=0# condition in EndSegments
             self.__flag="out"
-            self.__numberOfWindowRejection=20 # 1600 samples -> need to modify it eventually
-            self.__lengthOfWindowMinima=150 # need to adapt this value 10*13
+            self.__numberOfWindowRejection=50 # 1600 samples -> need to modify it eventually
+            self.__lengthOfWindowMinima=260 # need to adapt this value 10*13
             self.__EnergyCoeffArray=np.empty(13,'f')
             self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
             self.__previous_amplitude_envelope=0.
@@ -54,19 +54,19 @@ class MFFCsRingBuffer(object):
                     print("Error : RingBuffer is overwritten ")
         
         def get(self):
-                #new version #
-                if self.__tail >= self.__lengthMax:
-					self.__tail=self.__lengthMax
-                idx=(0+np.arange(self.__tail))
-                temp=np.array(self.__data[idx])
+					if self.__tail >= self.__lengthMax:
+						self.__tail=self.__lengthMax
+					print "Length of segments is :" , self.__tail/13
+					idx=(0+np.arange(self.__tail))
+					temp=np.array(self.__data[idx])
                 ######### NEW add 2017.05.11 #####
 				# comment 20 05 2017 MFCCsN=DSP.FeatureNormalization(temp)
-                MFCCs=temp.reshape((len(idx)/13),13).T
+					MFCCs=temp.reshape((len(idx)/13),13).T
                 ######### END NEW add ####### NORMALIZATION ####
-                delta=function.deltaMFCCs(MFCCs,9)
-                deltaDelta=function.deltaMFCCs(delta,9)
-                mfccs=np.concatenate((MFCCs,delta,deltaDelta),axis=0)
-                mfccs_reshape=mfccs.reshape(mfccs.size,order='F')
+					delta=function.deltaMFCCs(MFCCs,9)
+					deltaDelta=function.deltaMFCCs(delta,9)
+					mfccs=np.concatenate((MFCCs,delta,deltaDelta),axis=0)
+					mfccs_reshape=mfccs.reshape(mfccs.size,order='F')
                 
                 ####### old version ######
               #  temp=np.array(self.__data).reshape((150,13)).T
@@ -74,12 +74,12 @@ class MFFCsRingBuffer(object):
               #  deltaDelta=function.deltaMFCCs(delta,9)
               #  mfccs=np.concatenate((temp,delta,deltaDelta),axis=0)
               #  np.savetxt('mfcc.out',mfccs)
-                self.__data=np.zeros(2600)
-                self.__index=0
-                self.__tail=0
-                self.__out="out"
+					self.__data=np.zeros(2600)
+					self.__index=0
+					self.__tail=0
+					self.__out="out"
         #       print "tail :" ,self.__tail , "new value ;" , self.__tail/13 
-                return np.concatenate((mfccs_reshape,np.zeros(self.__lengthMax*3-mfccs_reshape.size)),axis=0),self.__SampleRingBuffer.getSegments(len(idx)/13)
+					return np.concatenate((mfccs_reshape,np.zeros(self.__lengthMax*3-mfccs_reshape.size)),axis=0),self.__SampleRingBuffer.getSegments(len(idx)/13)
 
         def flag(self,data,threshold,entropyDistance,entropyThresh,coeff,energy, AudioSample):
                 # first case
@@ -104,28 +104,28 @@ class MFFCsRingBuffer(object):
                         self.__EnergyCoeffArray[1+np.arange(12)]=coeff[1+np.arange(12)]
                         
                 if self.__flag=="in" :
-                        self.__tail=self.__index
-                        self.extend(self.__EnergyCoeffArray)
-                        self.__SampleRingBuffer.extendSegments(AudioSample)
-                        self.__count=0
-                        self.__cond=0
-                        self.__previous_amplitude_envelope=np.sum(np.abs(hilbert(AudioSample)))
+							self.__tail=self.__index
+							self.extend(self.__EnergyCoeffArray)
+							self.__SampleRingBuffer.extendSegments(AudioSample)
+							self.__count=0
+							self.__cond=0
+							self.__previous_amplitude_envelope=np.sum(np.abs(hilbert(AudioSample)))
                         
                 if self.__flag=="io" :
-                        self.__cond,self.__tail,self.__previous_amplitude_envelope =DSP.EndSegments(self.__cond,self.__previous_amplitude_envelope,self.__index,self.__tail, AudioSample)
+							self.__cond,self.__tail,self.__previous_amplitude_envelope =DSP.EndSegments(self.__cond,self.__previous_amplitude_envelope,self.__index,self.__tail, AudioSample)
                         #print(self.__tail)
                         #print(self.__previous_amplitude_envelope)
-                        if self.__count <=self.__numberOfWindowRejection :
-                                self.__count+=1
-                                self.extend( self.__EnergyCoeffArray)
-                                self.__SampleRingBuffer.extendSegments(AudioSample)
-                        else :
-                                delete_index=(self.__tail+np.arange(self.__index-self.__tail))
-                                self.__data[delete_index]=0.
-                                self.__count=0
-                           #     print(self.__index)
-                                self.__flag="done"
-                                self.__index=0
+							if self.__count <=self.__numberOfWindowRejection :
+									self.__count+=1
+									self.extend( self.__EnergyCoeffArray)
+									self.__SampleRingBuffer.extendSegments(AudioSample)
+							else :
+									delete_index=(self.__tail+np.arange(self.__index-self.__tail))
+									self.__data[delete_index]=0.
+									self.__count=0
+                           #    	 print(self.__index)
+									self.__flag="done"
+									self.__index=0
 
                 if self.__flag=="done" :
                         if self.__tail< self.__lengthOfWindowMinima :

@@ -9,6 +9,7 @@ import tools
 import cPickle
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
  
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
@@ -42,6 +43,7 @@ class Sphere_calibration(object):
 				idx=(i*self.__prof+np.arange(self.__prof))
 			#idx_2=(i*1950+np.arange(1950))
 				self.__feature[:,idx]=np.reshape(features[:,i],(39,self.__prof), order='F')
+			
 		elif (types=="test"):
 			self.__feature=np.reshape(features,(39,self.__prof), order='F')
 			#self.__Output[idx_2]=numpy.matlib.repmat(label,1,1950)
@@ -95,52 +97,35 @@ class Sphere_calibration(object):
 		new_x=np.zeros(self.__DataLength*self.__prof*13)
 		new_y=np.zeros(self.__DataLength*self.__prof*13)
 		new_z=np.zeros(self.__DataLength*self.__prof*13)
+		P_abs=np.zeros(self.__DataLength*self.__prof*13)
+		Q=np.zeros(x.size)
 				## operation
 		for i in range(0,x.size):
 			if x[i] != 0:
 				new_x[i]=((x[i]-meanx)/stdx)-self.__center[0]
 				new_y[i]=((y[i]-meany)/stdy)-self.__center[1]
 				new_z[i]=((z[i]-meanz)/stdz)-self.__center[2]
+				P_abs[i]=math.sqrt(new_x[i] **2 +new_y[i]**2 + new_z[i]**2)
+				Q[i]=(self.__rayon/P_abs[i]).T
 			else :
 				new_x[i]=0
 				new_y[i]=0
 				new_z[i]=0
-		# Paramter to create sphere with dataset
-				## allocation of memory
-		P_abs=np.zeros(self.__DataLength*self.__prof*13)
-				## operation
-		P=(np.vstack((new_x,new_y,new_z))).T
-		for i in range(0, x.size):
-			P_abs[i]=math.sqrt(new_x[i] **2 +new_y[i]**2 + new_z[i]**2)
-		Q=np.zeros(P_abs.size)
-		for i in range (0, P_abs.size):
-			if P_abs[i] !=0 :
-				Q[i]=(self.__rayon/P_abs[i]).T
-			else :
+				P_abs[i]=0
 				Q[i]=0
+		# Paramter to create sphere with dataset
+		P=(np.vstack((new_x,new_y,new_z))).T
 		# Sphere data
 				## allocation of memory
 		SphereData=np.zeros((self.__DataLength*self.__prof*13,3))
 		for i in range(0,3):
 			SphereData[:,i]=Q*P[:,i]
-		for i in range (0,3):
 			for j in range(0,self.__DataLength*self.__prof*13):
 				if math.isnan(SphereData[j,i])==True :
 					SphereData[j,i]=0
+			
 		feat_struct=np.concatenate((SphereData[:,0].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,1].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,2].reshape(13,self.__prof*self.__DataLength,order='F')),axis=0)
-		## plot 3D
-		#fig=plt.figure()
-		#ax=fig.add_subplot(111,projection='3d')
-		#xs=SphereData[:,0]
-		#ys=SphereData[:,1]
-		#zs=SphereData[:,2]
-		#ax.scatter(xs,ys,zs,c='r',marker='o')
-		#
-		#ax.set_xlabel('X Label')
-		#ax.set_ylabel('Y Label')
-		#ax.set_zlabel('Z Label')
-		#plt.show()
-		# return features matrix
+
 				## allocation of memory
 		features=np.zeros((39*self.__prof,self.__DataLength))
 		for i in range (0,self.__DataLength):

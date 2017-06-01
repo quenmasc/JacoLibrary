@@ -16,8 +16,9 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import StratifiedKFold
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.multiclass import OneVsRestClassifier , OutputCodeClassifier
 from sklearn.preprocessing import StandardScaler
+
 import tools
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
@@ -28,17 +29,15 @@ __version__="1.0-dev"
 def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
     R1=-1
     P1=-1
-    R2=-1
-    P2=-1
     R1=classifier.predict(Vector)
-    #P1=classifier.predict_proba(Vector)
+   # P1=classifier.predict_proba(Vector)
     if R1 == 1 :
 		R2=classifierL.predict(Vector)
 		#P2=classifierL.predict_proba(Vector)
     elif R1 == 2 :
         R2=classifierR.predict((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
        # P2=classifierR.predict_proba((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
-    return R1 , R2 , P1 , P2
+    return R1 , R2 
 
 def TrainBestParams(params,features,classLabel):
     svm=OneVsRestClassifier(SVC(probability=True, **params))
