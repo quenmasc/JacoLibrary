@@ -30,17 +30,22 @@ class _Limiter(object):
 					
 					self.__enveloppe*=self.__release 
 					self.__enveloppe=max(abs(signal[i]),self.__enveloppe)
-					if (self.__enveloppe >= self.__threshold and self.__Timer==0 ):
+					
+				if(self.__enveloppe >=self.__threshold and self.__Timer!=0 and self.__Timer <=100):
+						self.__Timer=1
+						
+				elif (self.__enveloppe < self.__threshold and self.__Timer<=100 and self.__Timer !=0):
+						self.__Timer+=1
+						
+				elif (self.__enveloppe >= self.__threshold and self.__Timer==0 ):
 						self.__Timer+=1
 					 	self.__evolve=1
-					elif(self.__enveloppe >=self.__threshold and self.__Timer!=0):
+					 	
+				elif (self.__enveloppe < self.__threshold and self.__Timer > 100) :
+						self.__evolve=0
 						self.__Timer=0
 						
-					elif (self.__enveloppe < self.__threshold and self.__Timer<=200 and self.__Timer !=0):
-						self.__Timer+=1
-					elif (self.__enveloppe < self.__threshold and self.__Timer > 200) :
-						self.__evolve=0
-					return self.__evolve
+				return self.__evolve
 						
 						
 						
