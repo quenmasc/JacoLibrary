@@ -54,18 +54,20 @@ class Speech_Recognition(object):
 					data, length = audio.read()
 					pdata=audio.pseudonymize(data)
 					ndata=DSP.normalize(pdata,32767.0)
-					if (Limit.limit(ndata)==1 and flag==False):
+					detection=Limit.limit(ndata)
+					if (detection==1 and flag==False):
 						audio.runBuffer()
 						flag=True
-					elif (Limit.limit(ndata)==0 and flag==True) :
+					elif (detection==0 and flag==True) :
 						audio.StopBuffer()
 						flag=False
-					elif (Limit.limit(ndata)==1 and flag==True):
-						flag=True
-					else :
-						flag=False
+					#elif (Limit.limit(ndata)==1 and flag==True):
+					#	flag=True
+					#elif (Limit.limit(ndata)==0 and flag==False):
+					#	flag=False
+					#else :
+					#	flag=False
 					if (flag==True):
-						#print "Acquire"
 						audio.RingBufferWrite(ndata)   # this line reduce rapidity of the program
 						if (c==[]) :
 							c=np.array(audio.RingBufferRead())
@@ -255,7 +257,6 @@ class Speech_Recognition(object):
 								if fl=="admit" :
 									self.__semaphore.acquire()
 									self.__condition.acquire()
-									print "Put data"
 									MfccsCoeff,Data=buff.get()
 									self.__condition.notify()
 									self.__condition.release()

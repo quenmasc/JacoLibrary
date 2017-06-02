@@ -30,8 +30,8 @@ class Record(object) :
 			self.__read_queue = Queue()
 			self.__read_frame = Queue()
 			self.__write_queue=Queue()
-			self.__RingBufferWrite_queue=Queue()
-			self.__RingBufferRead_queue=Queue()
+			#self.__RingBufferWrite_queue=Queue()
+			#self.__RingBufferRead_queue=Queue()
 	# params  
 			self.__format=alsa.PCM_FORMAT_S16_LE # format of sample 
 			self.__byte =4 # size of each sample 
@@ -104,10 +104,12 @@ class Record(object) :
 				#self.__write_process.start()
       
 		def runBuffer(self):
-				print "Data Collector is running"
+				print tools.bcolors.WARNING + "Data Collector is running" + tools.bcolors.ENDC
 				RingLength=24650
 				window_sample=200
 				step_sample=80
+				self.__RingBufferWrite_queue=Queue()
+				self.__RingBufferRead_queue=Queue()
 				ring=RingBuffer.RingBuffer(RingLength,window_sample,step_sample)
 				self.__RingBuffer_write_process = Process (target =self.__RingBufferWrite, args=(ring,))
 				self.__RingBuffer_write_process.start()
@@ -116,10 +118,12 @@ class Record(object) :
 				#self.__write_process.terminate()
 
 		def StopBuffer(self):
-				print "Data Collector is stopped"
+				print tools.bcolors.WARNING + "Data Collector is stopped" + tools.bcolors.ENDC
+				while not self.__RingBufferWrite_queue.empty():
+					self.__RingBufferWrite_queue.get()
+				while not self.__RingBufferRead_queue.empty():
+					self.__RingBufferRead_queue.get()
 				self.__RingBuffer_write_process.terminate()
-				self.__RingBufferWrite_queue=Queue()
-				self.__RingBufferRead_queue=Queue()
         
 		def read(self):
 				return self.__read_queue.get() , self.__read_frame.get()     

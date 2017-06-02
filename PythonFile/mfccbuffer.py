@@ -56,7 +56,6 @@ class MFFCsRingBuffer(object):
         def get(self):
 					if self.__tail >= self.__lengthMax:
 						self.__tail=self.__lengthMax
-					print "Length of segments is :" , self.__tail/13
 					idx=(0+np.arange(self.__tail))
 					temp=np.array(self.__data[idx])
 					MFCCs=temp.reshape((len(idx)/13),13).T
@@ -68,7 +67,6 @@ class MFFCsRingBuffer(object):
 					self.__index=0
 					self.__tail=0
 					self.__out="out"
-        #       print "tail :" ,self.__tail , "new value ;" , self.__tail/13 
 					return np.concatenate((mfccs_reshape,np.zeros(self.__lengthMax*3-mfccs_reshape.size)),axis=0),self.__SampleRingBuffer.getSegments(len(idx)/13)
 
         def flag(self,data,threshold,entropyDistance,entropyThresh,coeff,energy, AudioSample):
