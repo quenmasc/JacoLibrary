@@ -19,7 +19,7 @@ class _Limiter(object):
 		self.__delayLine=np.zeros(self.__delay, 'f')
 		self.__enveloppe=0
 		self.__delayIndex=0
-		self.__threshold=0.2
+		self.__threshold=0.1
 		self.__Timer=0
 		self.__evolve=0
 		
@@ -31,17 +31,17 @@ class _Limiter(object):
 					self.__enveloppe*=self.__release 
 					self.__enveloppe=max(abs(signal[i]),self.__enveloppe)
 					
-				if(self.__enveloppe >=self.__threshold and self.__Timer!=0 and self.__Timer <=100):
+				if(self.__enveloppe >=self.__threshold and self.__Timer!=0 and self.__Timer <=150):
 						self.__Timer=1
 						
-				elif (self.__enveloppe < self.__threshold and self.__Timer<=100 and self.__Timer !=0):
+				elif (self.__enveloppe < self.__threshold and self.__Timer<=150 and self.__Timer !=0):
 						self.__Timer+=1
 						
 				elif (self.__enveloppe >= self.__threshold and self.__Timer==0 ):
 						self.__Timer+=1
 					 	self.__evolve=1
 					 	
-				elif (self.__enveloppe < self.__threshold and self.__Timer > 100) :
+				elif (self.__enveloppe < self.__threshold and self.__Timer > 150) :
 						self.__evolve=0
 						self.__Timer=0
 						

@@ -99,9 +99,9 @@ class Record(object) :
         #self.__pre_post_data()
        # index=Queue()
 				self.__read_process = Process(target=self.__read)
-				#self.__write_process = Process(target = self.__write)
+				self.__write_process = Process(target = self.__write)
 				self.__read_process.start()
-				#self.__write_process.start()
+				self.__write_process.start()
       
 		def runBuffer(self):
 				print tools.bcolors.WARNING + "Data Collector is running" + tools.bcolors.ENDC

@@ -42,32 +42,43 @@ class Speech_Recognition(object):
 			self.__fifo_name= 'fifo'
            
 		def Recorder(self):
-			global AudioData
+			global AudioData 
 			audio= alsa_record.Record()
 			audio.run()
 			Limit=Limiter._Limiter()
 			i=0 
 			c=[]
 			flag=False
-
+			self.__t2=threading.Thread(target=self.SVM)
+			self.__t3=threading.Thread(target=self.VocalActivityDetection)
+			self.__t2.start()
+			self.__t3.start()
+			# StartFlag
+			StartFlag=0
+			StartCount=0
 			while True :
 					data, length = audio.read()
 					pdata=audio.pseudonymize(data)
 					ndata=DSP.normalize(pdata,32767.0)
 					detection=Limit.limit(ndata)
-					if (detection==1 and flag==False):
+					if (StartCount!=0 and StartCount <=150 and StartFlag==0):
+						StartCount+=1
+					if (StartFlag==0 and StartCount==0 and StartFlag==0):
 						audio.runBuffer()
 						flag=True
-					elif (detection==0 and flag==True) :
+						StartCount+=1
+					if (StartCount >150 and StartFlag==0):
+						StartFlag=1
 						audio.StopBuffer()
-						flag=False
-					#elif (Limit.limit(ndata)==1 and flag==True):
-					#	flag=True
-					#elif (Limit.limit(ndata)==0 and flag==False):
-					#	flag=False
-					#else :
-					#	flag=False
+						flag=False 
+					if (detection==1 and flag==False and StartFlag==1):
+						audio.runBuffer()
+						flag=True
+					elif (detection==0 and flag==True and StartFlag==1) :
+						audio.StopBuffer()
+						flag=False 
 					if (flag==True):
+						
 						audio.RingBufferWrite(ndata)   # this line reduce rapidity of the program
 						if (c==[]) :
 							c=np.array(audio.RingBufferRead())
@@ -84,13 +95,14 @@ class Speech_Recognition(object):
 						self.__condition2.notify()
 						self.__condition2.release()
 						c=[]
-					#ndata=audio.depseudonymize(pdata)
-					#audio.write(ndata)
+					ndata=audio.depseudonymize(pdata)
+					audio.write(ndata)
 			print("out of loop")
 			print("end of transmission -> wait")
       
 		def SVM(self):
 			global MfccsCoeff
+			global Data
 			self.__svm=AudioIO.LoadClassifier("SVM_Trained")
 			self.__svmL=AudioIO.LoadClassifier("LeftSVM_Trained")
 			self.__svmR=AudioIO.LoadClassifier("RightSVM_Trained")
@@ -115,21 +127,22 @@ class Speech_Recognition(object):
 						self.__condition.wait()
 						self.__semaphore.acquire()
 						MfccsCoeffGet=MfccsCoeff
+						Audio=Data
 						self.__semaphore.release()
 						self.__condition.release()
 						newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T
 						classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
-						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[0][0])
+						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
 						print classLab
 						self.write_Pipe(classL)
-						#file=wave.open('test.wav','wb')
-						#file.setparams((1,2,8000,len(AudioData),"NONE","not compressed"))
-						#file.writeframes(self.depseudonymize(np.array(DSP.denormalize(Audio,32767.)).astype(int)))
-						#file.close()
-						#print "Done ..."
+						file=wave.open('test.wav','wb')
+						file.setparams((1,2,8000,len(AudioData),"NONE","not compressed"))
+						file.writeframes(self.depseudonymize(np.array(DSP.denormalize(Audio,32767.)).astype(int)))
+						file.close()
+						print "Done ..."
 				         
 		def write_Pipe(self,classL):
-			with open(self.__fifo_name,'wb') as f:
+			with open('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name,'wb') as f:
 				f.write('{}\n'.format(len(bin(classL)[2:])).encode())
 				f.write(bin(classL)[2:])
 				f.flush()
@@ -140,18 +153,19 @@ class Speech_Recognition(object):
         
 		def running(self):
 			self.__t1=threading.Thread(target=self.Recorder) 
-			self.__t2=threading.Thread(target=self.SVM)
-			self.__t3=threading.Thread(target=self.VocalActivityDetection)
+			#self.__t2=threading.Thread(target=self.SVM)
+			#self.__t3=threading.Thread(target=self.VocalActivityDetection)
 			self.__t1.start()
-			self.__t2.start()
-			self.__t3.start()
+			#self.__t2.start()
+			#self.__t3.start()
 			self.__t1.join()
-			self.__t2.join()
-			self.__t3.join()     
+			#self.__t2.join()
+			#self.__t3.join()     
 
 		def VocalActivityDetection(self):
 			global AudioData
 			global MfccsCoeff
+			global Data
 			mfcc = MFCC.MFCCs()
 			entropy = spectral_entropy.SPECTRAL_ENTROPY()
 			buff=mfccbuffer.MFFCsRingBuffer()
