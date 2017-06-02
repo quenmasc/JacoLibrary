@@ -8,11 +8,13 @@
 #include <vector>
 #include <sys/stat.h>
 #include <libkindrv/kindrv.h>
+#include <queue>
 
 using namespace KinDrv;
 PythonBridge Bridge ;
 
 /* JACO ARM INITIALIZATION */
+
 int
 goto_retract(JacoArm *arm)
 {
@@ -174,20 +176,18 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 }
 
 
-/* My THREAD */
+ /*My THREAD */
 
-void foo(){
-	PyGILState_STATE gstate=PyGILState_Ensure();
+void PythonRoutine(){
+	//PyGILState_STATE gstate=PyGILState_Ensure();
 	Bridge.Running_python();
-	PyGILState_Release(gstate);
+	//PyGILState_Release(gstate);
 	//while(1){}
 }
 
-void fol(){
-	Bridge.ClassValue2();
-}
 
-void mess(JacoArm *arm,jaco_joystick_axis_t axes){
+
+void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue ){
 	sleep(2);
 	const char *fifo_name="/home/pi/libkindrv/examples/build/fifo";
 	std::cout << "Pipe is opened" << std::endl;
@@ -197,15 +197,10 @@ void mess(JacoArm *arm,jaco_joystick_axis_t axes){
 	mknod(fifo_name,S_IFIFO | 0666,0);
 	std::ifstream f(fifo_name);
 	std::string(line);
-	//getline(f,line);
-	//printf("in");
 	while(getline(f,line)){
 	auto data_size=std::stoi(line);
-	//std::cout << "Size" << data_size << std::endl;
 	std::string data;
-	
 	if (!f.good()){
-	//	std::cerr <<"read failed" << std::endl ;
 	}
 	{
 		std::vector<char> buf(data_size);
@@ -214,28 +209,39 @@ void mess(JacoArm *arm,jaco_joystick_axis_t axes){
 	}
 	n=std::stoi(data,nullptr,2);
 	std::cout << "class is : " << n << std::endl;
-	
+	my_queue.push(n);
 }
-ModeCHange(arm,axes, OldClass,  n);
-OldClass=n;
+//ModeCHange(arm,axes, OldClass,  n);
+//OldClass=n;
 }
 }
 
-
+void Result (std::queue<int> &my_queue){
+	int n;
+	n=0;
+	while(1){
+		while(!my_queue.empty()){
+		n=my_queue.front();
+		my_queue.pop();
+		printf("Value :%i\n",n);
+		}
+	}
+}
 
 
 int main(){
-  
-/* Create JACO ARM and Initialization */
-  printf("Speech Recognition Module \n");
+	// queues
+	std::queue<int> my_queue;
 
+  printf("Speech Recognition Module \n");
+/*
   // explicitly initialize jaco_joystick_axis_t axesa libusb context; optional
   KinDrv::init_usb();
 
 
-
+*/
   printf("Create a JacoArm \n");
-  JacoArm *arm;
+  JacoArm *arm;/*
   try {
     arm = new JacoArm();
     printf("Successfully connected to arm! \n");
@@ -278,16 +284,18 @@ int main(){
   printf("Sending joystick movements. We want the arm to: \n");
   // Check the documentation (or types.h) to see how to interprete the joystick-values.
   // Also make sure, that all the fields of a joystick-structs that should not have an effect are set to 0! So initialize all jaco_joystick_ structs with 0!
-  jaco_joystick_axis_t axes = {0};
+*/  jaco_joystick_axis_t axes = {0};
 	
-	
-	/* launch all my thread */
-	std:: thread first(foo) ;
-	std:: thread second(fol);
-	std:: thread third(mess,arm,axes);
+
+/*  launch all my thread */
+ 
+	printf("threading");
+	std:: thread first(PythonRoutine) ;
+	std:: thread third(PipeClass,arm,axes, std::ref(my_queue));
+	std:: thread dd(Result,std::ref(my_queue));
 	first.join();
-	second.join();
 	third.join();
+	dd.join();
 	return 0 ;
 	
 }
