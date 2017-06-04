@@ -49,54 +49,54 @@ class Speech_Recognition(object):
 			i=0 
 			c=[]
 			flag=False
-			self.__t2=threading.Thread(target=self.SVM)
-			self.__t3=threading.Thread(target=self.VocalActivityDetection)
-			self.__t2.start()
-			self.__t3.start()
+			#self.__t2=threading.Thread(target=self.SVM)
+			#self.__t3=threading.Thread(target=self.VocalActivityDetection)
+			#self.__t2.start()
+			#self.__t3.start()
 			# StartFlag
 			StartFlag=0
 			StartCount=0
 			while True :
 					data, length = audio.read()
-					pdata=audio.pseudonymize(data)
-					ndata=DSP.normalize(pdata,32767.0)
-					detection=Limit.limit(ndata)
-					if (StartCount!=0 and StartCount <=150 and StartFlag==0):
-						StartCount+=1
-					if (StartFlag==0 and StartCount==0 and StartFlag==0):
-						audio.runBuffer()
-						flag=True
-						StartCount+=1
-					if (StartCount >150 and StartFlag==0):
-						StartFlag=1
-						audio.StopBuffer()
-						flag=False 
-					if (detection==1 and flag==False and StartFlag==1):
-						audio.runBuffer()
-						flag=True
-					elif (detection==0 and flag==True and StartFlag==1) :
-						audio.StopBuffer()
-						flag=False 
-					if (flag==True):
+					#pdata=audio.pseudonymize(data)
+					#ndata=DSP.normalize(pdata,32767.0)
+					#detection=Limit.limit(ndata)
+					#if (StartCount!=0 and StartCount <=150 and StartFlag==0):
+					#	StartCount+=1
+					#if (StartFlag==0 and StartCount==0 and StartFlag==0):
+					#	audio.runBuffer()
+					#	flag=True
+					#	StartCount+=1
+					#if (StartCount >150 and StartFlag==0):
+					#	StartFlag=1
+					#	audio.StopBuffer()
+					#	flag=False 
+					#if (detection==1 and flag==False and StartFlag==1):
+					#	audio.runBuffer()
+					#	flag=True
+					#elif (detection==0 and flag==True and StartFlag==1) :
+					#	audio.StopBuffer()
+					#	flag=False 
+					#if (flag==True):
 						
-						audio.RingBufferWrite(ndata)   # this line reduce rapidity of the program
-						if (c==[]) :
-							c=np.array(audio.RingBufferRead())
-						else :
+					#	audio.RingBufferWrite(ndata)   # this line reduce rapidity of the program
+					#	if (c==[]) :
+					#		c=np.array(audio.RingBufferRead())
+					#	else :
 
-							print ("Overwrite")
-							return
+					#		print ("Overwrite")
+					#		return
 					
 					
-						self.__condition2.acquire()
-						self.__semaphore2.acquire()
-						AudioData=c
-						self.__semaphore2.release()
-						self.__condition2.notify()
-						self.__condition2.release()
-						c=[]
-					ndata=audio.depseudonymize(pdata)
-					audio.write(ndata)
+					#	self.__condition2.acquire()
+					#	self.__semaphore2.acquire()
+					#	AudioData=c
+					#	self.__semaphore2.release()
+					#	self.__condition2.notify()
+					#	self.__condition2.release()
+					#	c=[]
+					#ndata=audio.depseudonymize(pdata)
+					audio.write(data)
 			print("out of loop")
 			print("end of transmission -> wait")
       

@@ -34,16 +34,9 @@ class Record(object) :
 			#self.__RingBufferRead_queue=Queue()
 	# params  
 			self.__format=alsa.PCM_FORMAT_S16_LE # format of sample 
-			self.__byte =4 # size of each sample 
+			self.__byte =2 # size of each sample 
 			self.__rate=8000 # sample rate
 			self.__channels=1 # number of channel use in record
-			self.__max=48000 # length max of ring buffer for float values
-	# change some parameters in terms of sample rate 
-			if self.__format==alsa.PCM_FORMAT_S16_LE :
-				self.__mgax=self.__max/2
-				self.__byte=self.__byte/2
-				self.__push_value=[self.__max/3, 2*self.__max/3,self.__max]
-       # self.__raw_data=[None for i in xrange(self.__max)]
 
 
 
@@ -53,11 +46,11 @@ class Record(object) :
 		""""Reads audio from ALSA audio device """
 		def __read(self) :
 			card='sysdefault:CARD=Device'  # define default recording card 
-			inp = alsa.PCM(alsa.PCM_CAPTURE, alsa.PCM_NORMAL,card) 
+			inp = alsa.PCM(alsa.PCM_CAPTURE, alsa.PCM_NONBLOCK,card) 
 			inp.setchannels(1) # number of channels
 			inp.setrate(self.__rate) # sample  rate
 			inp.setformat(self.__format) # format of sample
-			inp.setperiodsize(self.__rate / 50) # buffer period size
+			inp.setperiodsize(self.__rate / 10) # buffer period size
 			print tools.bcolors.OKGREEN + "In alsa_record - Audio Device is correctly parameted" + tools.bcolors.ENDC
         
 
@@ -70,11 +63,11 @@ class Record(object) :
 		def __write(self):
 				card='sysdefault:CARD=Device'
 
-				outp = alsa.PCM(alsa.PCM_PLAYBACK, alsa.PCM_NORMAL,card)
+				outp = alsa.PCM(alsa.PCM_PLAYBACK, alsa.PCM_NONBLOCK,card)
 				outp.setchannels(1)
 				outp.setrate(self.__rate)
 				outp.setformat(alsa.PCM_FORMAT_S16_LE)
-				outp.setperiodsize(self.__rate / 50)
+				outp.setperiodsize(2*self.__rate / 10)
 
 				while True:
 
