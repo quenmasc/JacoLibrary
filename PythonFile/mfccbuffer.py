@@ -37,14 +37,15 @@ class MFFCsRingBuffer(object):
             self.__Env=Env=Envelope._Envelope()
                 
         def extend(self,data):
-            data_index=(self.__index+np.arange(data.size))
-            if np.all(self.__data[data_index]==np.zeros(len(data_index))) :
-                    self.__data[data_index]=data
-                    self.__index=data_index[-1]+1
-                    if self.__index >= self.__length :
-                            print("fatal Error : segment too long")
-            else :
-                    print("Error : RingBuffer is overwritten ")
+				print self.__index
+				data_index=(self.__index+np.arange(data.size))
+				if np.all(self.__data[data_index]==np.zeros(len(data_index))) :
+						self.__data[data_index]=data
+						self.__index=data_index[-1]+1
+						if self.__index >= self.__length :
+								print("fatal Error : segment too long")
+				else :
+						print("Error : RingBuffer is overwritten ")
         def extend2(self,data):
             data_index=(self.__tail+np.arange(data.size))
             if np.all(self.__data[data_index]==np.zeros(len(data_index))) :
@@ -56,6 +57,7 @@ class MFFCsRingBuffer(object):
                     print("Error : RingBuffer is overwritten ")
         
         def get(self):
+					print self.__tail
 					if self.__tail >= self.__lengthMax:
 						self.__tail=self.__lengthMax
 					idx=(0+np.arange(self.__tail))
@@ -73,29 +75,29 @@ class MFFCsRingBuffer(object):
 
         def flag(self,data,threshold,entropyDistance,entropyThresh,coeff,energy, AudioSample):
                 # first case
-                if (data<threshold or entropyDistance<entropyThresh)  and self.__flag=="rejeted" :
-                        self.__flag="out"
+					if (data<threshold or entropyDistance<entropyThresh)  and self.__flag=="rejeted" :
+									self.__flag="out"
                         
-                if (data<threshold or entropyDistance<entropyThresh) and self.__flag=="admit" :
-                        self.__flag="out"
+					if (data<threshold or entropyDistance<entropyThresh) and self.__flag=="admit" :
+									self.__flag="out"
                         
-                if (data>=threshold and entropyDistance>=entropyThresh) and self.__flag=="out" :
-							self.__flag="in"
-							self.__SampleRingBuffer.initialize()
-							self.__Env.initialize()
+					if (data>=threshold and entropyDistance>=entropyThresh) and self.__flag=="out" :
+								self.__flag="in"
+								self.__SampleRingBuffer.initialize()
+								self.__Env.initialize()
                         
-                if (data<threshold and entropyDistance<entropyThresh) and self.__flag=="in" :
-							self.__flag="io"
+					if (data<threshold and entropyDistance<entropyThresh) and self.__flag=="in" :
+								self.__flag="io"
 	
-                if (data>=threshold and entropyDistance>=entropyThresh) and self.__flag=="io" :
-                        self.__flag="in"
+					if (data>=threshold and entropyDistance>=entropyThresh) and self.__flag=="io" :
+							self.__flag="in"
 
-                if self.__flag=="in" or self.__flag=="io" :
-                        self.__EnergyCoeffArray[0]=energy
-                        self.__EnergyCoeffArray[1+np.arange(12)]=coeff[1+np.arange(12)]
+					if self.__flag=="in" or self.__flag=="io" :
+							self.__EnergyCoeffArray[0]=energy
+							self.__EnergyCoeffArray[1+np.arange(12)]=coeff[1+np.arange(12)]
                         
                         
-                if self.__flag=="in" :
+					if self.__flag=="in" :
 							
 							self.__tail=self.__index
 							self.extend(self.__EnergyCoeffArray)
@@ -103,7 +105,7 @@ class MFFCsRingBuffer(object):
 							self.__count=0
 							self.__envelope = self.__Env.UpperSlope(AudioSample)
 							
-                if self.__flag=="io" :
+					if self.__flag=="io" :
 							current_Env=self.__Env.UpperSlope(AudioSample)
 							self.__tail =DSP.EndSegments(self.__envelope, current_Env,self.__index,self.__tail)
 							self.__envelope=current_Env
@@ -120,14 +122,16 @@ class MFFCsRingBuffer(object):
 									self.__flag="done"
 									self.__index=0
 
-                if self.__flag=="done" :
-                        if self.__tail< self.__lengthOfWindowMinima :
-                                self.__flag="rejeted"
-                                print "rejected"
-                                self.__data=np.zeros(2600)
-                        else :
-                                self.__flag="admit"
-				
-                return self.__flag
+					if self.__flag=="done" :
+							if self.__tail< self.__lengthOfWindowMinima :
+									self.__flag="rejeted"
+									print "rejected"
+									self.__data=np.zeros(2600)
+							else :
+									self.__flag="admit"
+
+					return self.__flag
+
+
                                 
                 

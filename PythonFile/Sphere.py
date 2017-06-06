@@ -64,9 +64,9 @@ class Sphere_calibration(object):
 			fo.close()
 			
 		elif (types == "test" ):	
-			#try :
-			#	fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
-			#except IOError :
+		#	try :
+		#		fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
+		#	except IOError :
 		#		print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
 		#		return
 		#	try :

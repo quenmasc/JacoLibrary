@@ -21,6 +21,8 @@ import SpectralSubstraction
 import math
 import wave
 import struct
+from audioop import ratecv
+
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-05-11"
 __version__="1.0-dev"
@@ -34,11 +36,12 @@ class Speech_Recognition(object):
 		ClassLab=0
 		""" Thread """ 
 		def __init__(self):
-			self.__maxconnections=2
-			self.__semaphore=threading.BoundedSemaphore(self.__maxconnections)
-			self.__condition=threading.Condition()
-			self.__semaphore2=threading.BoundedSemaphore(self.__maxconnections)
-			self.__condition2=threading.Condition()
+			self.__semaphore2=threading.Semaphore(0)
+			self.__semaphore2Lock=threading.Semaphore(1)
+			self.__semaphore=threading.Semaphore(0)
+			self.__semaphoreLock=threading.Semaphore(1)
+			self.__lock=Lock()
+			self.__lock2 = Lock()
 			self.__fifo_name= 'fifo'
            
 		def Recorder(self):
@@ -57,8 +60,11 @@ class Speech_Recognition(object):
 			StartCount=0
 			rr=b''
 			while True :
+					#state=None
 					data, length = audio.read()
+					#ndata , state=ratecv(data,2,1,48000,8000,state)
 					pdata=audio.pseudonymize(data)
+					#pdata=function.LowPass(pdata)
 					ndata=DSP.normalize(pdata,32767.0)
 					detection=Limit.limit(ndata)
 					if (StartCount!=0 and StartCount <=150 and StartFlag==0):
@@ -86,14 +92,10 @@ class Speech_Recognition(object):
 
 							print ("Overwrite")
 							return
-					
-					
-						self.__condition2.acquire()
-						self.__semaphore2.acquire()
-						AudioData=c
+						self.__semaphore2Lock.acquire()
+						with self.__lock2 :
+								AudioData=c
 						self.__semaphore2.release()
-						self.__condition2.notify()
-						self.__condition2.release()
 						c=[]
 					ndata=audio.depseudonymize(pdata)
 					audio.write(data)
@@ -123,24 +125,18 @@ class Speech_Recognition(object):
         
         
 			while True :
-						self.__condition.acquire()
-						self.__condition.wait()
-						self.__semaphore.acquire()
-						MfccsCoeffGet=MfccsCoeff
-						Audio=Data
-						self.__semaphore.release()
-						self.__condition.release()
-						newcoeff=(CoeffSphere.ClassAndFeaturesSplit(AudioIO.WAV2MFCCs(Audio),"test")).T #
-						classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
-						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
-						print classLab
-						
-						#file=wave.open('test.wav','wb')
-						#file.setparams((1,2,8000,len(AudioData),"NONE","not compressed"))
-						#file.writeframes(self.depseudonymize(np.array(DSP.denormalize(Audio,32767.)).astype(int)))
-						#file.close()
-						self.write_Pipe(classL)
-						#print "Done ..."
+					#with self.__condition :
+						#self.__condition.wait()
+					self.__semaphore.acquire()
+					with self.__lock :
+							MfccsCoeffGet=MfccsCoeff
+							Audio=Data
+					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T #
+					classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
+					classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
+					print classLab
+					#	self.write_Pipe(classL)
+					print "Done ..."
 				         
 		def write_Pipe(self,classL):
 			with open('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name,'wb') as f:
@@ -154,14 +150,8 @@ class Speech_Recognition(object):
         
 		def running(self):
 			self.__t1=threading.Thread(target=self.Recorder) 
-			#self.__t2=threading.Thread(target=self.SVM)
-			#self.__t3=threading.Thread(target=self.VocalActivityDetection)
 			self.__t1.start()
-			#self.__t2.start()
-			#self.__t3.start()
-			self.__t1.join()
-			#self.__t2.join()
-			#self.__t3.join()     
+			self.__t1.join()   
 
 		def VocalActivityDetection(self):
 			global AudioData
@@ -202,32 +192,23 @@ class Speech_Recognition(object):
 			corr=np.empty((2,1),'f')
 			flag=0
 			while True :
-				self.__condition2.acquire()
-				self.__condition2.wait()
 				self.__semaphore2.acquire()
-				c=AudioData
-				self.__semaphore2.release()
-				self.__condition2.release()
+				with self.__lock2 :
+						c=AudioData
+				self.__semaphore2Lock.release()
 				if flag < 2:
 						flag+=1
 
 				else :
-						#pool = Pool(processes=2)
-						for i in range(0,2) :
-							# return MFCC and spectral entropy
-						#	if j>=100 :
-						#		d=SpectralSub.Substraction(c[i])
-						#		for k in range(len(d)):
-						#			if math.isnan(d[k])==True:
-						#				c[i,k]=c[i,k]
+						for i in range(len(c)) :
 							coeff,energy=mfcc.MFCC(np.array((c[i])))
 							SEntropy=entropy.SpectralEntropy(np.array((c[i])))
 							
 							if j<100 :
-								Noise=SpectralSub.STFT(c[i])
+								#Noise=SpectralSub.STFT(c[i])
 								mfccNoise+=np.array(coeff)
 								entropyData.append(SEntropy)
-								BackgroundNoise.append(Noise)
+								#BackgroundNoise.append(Noise)
 								j+=1
 								if j==100 :
 									mfccNoise=mfccNoise/100
@@ -243,7 +224,7 @@ class Speech_Recognition(object):
 										n.append(entropyData[79+i])
 									entropyData=deque([])
 									entropyData=n
-									SpectralSub.StoreParameter(BackgroundNoise)
+									#SpectralSub.StoreParameter(BackgroundNoise)
 							else :
 								
 							# return MFCC and Spectral Entropy background noise
@@ -264,14 +245,11 @@ class Speech_Recognition(object):
 
 								fl=buff.flag(corr,th[i],entropyDistance,entropyThresh,coeff,energy,np.array(c[i]))
 								if fl=="admit" :
-									self.__semaphore.acquire()
-									self.__condition.acquire()
-									MfccsCoeff,Data=buff.get()
-									self.__condition.notify()
-									self.__condition.release()
-									self.__semaphore.release()
-						#pool.close()			
-
+									#with self.__condition :
+										with self.__lock :
+											MfccsCoeff,Data=buff.get()
+										#	self.__condition.notify()
+											self.__semaphore.release()
 				c=[]     
     
 

@@ -1,6 +1,6 @@
 # all import here
 import alsaaudio as alsa
-from multiprocessing import Process, Queue , Pool , Lock
+from multiprocessing import Process, Queue , Pool 
 import numpy as np
 import math
 import struct
@@ -19,6 +19,7 @@ from collections import deque
 from scipy.signal import hilbert
 import AudioIO
 import tools
+from threading import Semaphore, Lock
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-04-14"
 __version__="1.1-dev"
@@ -37,8 +38,9 @@ class Record(object) :
 			self.__byte =2 # size of each sample 
 			self.__rate=8000 # sample rate
 			self.__channels=1 # number of channel use in record
-
-
+			self.__lock = Lock ()
+			self.__semaphore = Semaphore(0)
+			
 
 
 
@@ -72,7 +74,6 @@ class Record(object) :
 				while True:
 
 					data = self.__write_queue.get()
-
 					outp.write(data)
 
 
@@ -119,7 +120,7 @@ class Record(object) :
 				self.__RingBuffer_write_process.terminate()
         
 		def read(self):
-				return self.__read_queue.get() , self.__read_frame.get()     
+					return self.__read_queue.get() , self.__read_frame.get()     
 
 		def write(self, data):
 				self.__write_queue.put(data)
@@ -147,8 +148,8 @@ class Record(object) :
 					data=self.__RingBufferWrite_queue.get()
 					ring.extend(data)
 					if flag==2 :
-						for i in range(0,2):
-							temp.append(ring.get().tolist())
+						#for i in range(0,2):
+						temp.append(ring.get().tolist())
 					else :
 						flag+=1
 						temp=0.01*np.ones((2,200))

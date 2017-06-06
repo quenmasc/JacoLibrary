@@ -54,6 +54,6 @@ def deltaMFCCs(MFCCs,w):
 def LowPass(data):
 	N=10
 	Fc=3750
-	Fs=8000
+	Fs=48000
 	h=scipy.signal.firwin(numtaps=N,cutoff=Fc,nyq=Fs/2)
 	return scipy.signal.lfilter(h,1.0,data,axis=0)
