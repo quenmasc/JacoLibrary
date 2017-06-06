@@ -191,7 +191,6 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 	sleep(2);
 	const char *fifo_name="/home/pi/libkindrv/examples/build/fifo";
 	std::cout << "Pipe is opened" << std::endl;
-	int OldClass;
 	int n;
 	while(1){
 	mknod(fifo_name,S_IFIFO | 0666,0);
@@ -208,23 +207,23 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 		data.assign(buf.data(),buf.size());
 	}
 	n=std::stoi(data,nullptr,2);
-	std::cout << "class is : " << n << std::endl;
 	my_queue.push(n);
 }
-//ModeCHange(arm,axes, OldClass,  n);
-//OldClass=n;
 }
 }
 
-void Result (std::queue<int> &my_queue){
+void Result (std::queue<int> &my_queue,JacoArm *arm,jaco_joystick_axis_t axes ){
 	int n;
+	int OldClass;
+	OldClass=0;
 	n=0;
 	while(1){
 		while(!my_queue.empty()){
 		n=my_queue.front();
 		my_queue.pop();
-		printf("Value :%i\n",n);
 		}
+		ModeCHange(arm,axes, OldClass,  n);
+		OldClass=n;
 	}
 }
 
@@ -234,14 +233,14 @@ int main(){
 	std::queue<int> my_queue;
 
   printf("Speech Recognition Module \n");
-/*
+
   // explicitly initialize jaco_joystick_axis_t axesa libusb context; optional
   KinDrv::init_usb();
 
 
-*/
+
   printf("Create a JacoArm \n");
-  JacoArm *arm;/*
+  JacoArm *arm;
   try {
     arm = new JacoArm();
     printf("Successfully connected to arm! \n");
@@ -284,7 +283,7 @@ int main(){
   printf("Sending joystick movements. We want the arm to: \n");
   // Check the documentation (or types.h) to see how to interprete the joystick-values.
   // Also make sure, that all the fields of a joystick-structs that should not have an effect are set to 0! So initialize all jaco_joystick_ structs with 0!
-*/  jaco_joystick_axis_t axes = {0};
+  jaco_joystick_axis_t axes = {0};
 	
 
 /*  launch all my thread */
@@ -292,7 +291,7 @@ int main(){
 	printf("threading");
 	std:: thread first(PythonRoutine) ;
 	std:: thread third(PipeClass,arm,axes, std::ref(my_queue));
-	std:: thread dd(Result,std::ref(my_queue));
+	std:: thread dd(Result,std::ref(my_queue),arm, axes);
 	first.join();
 	third.join();
 	dd.join();
