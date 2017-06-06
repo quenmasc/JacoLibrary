@@ -28,7 +28,7 @@ __version__="1.0-dev"
 
 def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
 		R1=-1
-		P1=-1
+		P1=-1 
 		R1=classifier.predict(Vector)
    # P1=classifier.predict_proba(Vector)
 		if R1 == 1 :

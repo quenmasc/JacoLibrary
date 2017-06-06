@@ -81,7 +81,8 @@ def FindWavFileAndStoreData():
 	print tools.bcolors.OKGREEN +"all done" +tools.bcolors.ENDC
 
 def WAV2MFCCs(data,window_sample=200,window_shift=80):
-		data=DSP.normalize(data,32767.0)
+		#data=DSP.normalize(data,32767.0)
+		data=DSP.DataNormalize(data)
 		buff=mfccbuffer.MFFCsRingBuffer()    
 		mfcc=MFCC.MFCCs()
 		nbFrame=(len(data)-window_sample)/window_shift

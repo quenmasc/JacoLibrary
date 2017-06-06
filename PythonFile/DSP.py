@@ -22,6 +22,13 @@ def normalize(data,max_value) :
     data=fac * (data)#- biais )
     return data
 
+def DataNormalize(data):
+	meanData=np.mean(np.array(data))
+	Data=np.zeros(len(data),'f')
+	for i in range(len(data)):
+		Data[i]=data[i]-meanData
+	maxData=np.amax(np.absolute(Data))
+	return Data/maxData
 	
 def threshold(data):
     # return 'true' if below the 'silent' threshold
@@ -32,14 +39,12 @@ def threshold(data):
     return data
   #  print(data)
 
-def EndSegments(cond,previous_amplitude_envelope,currIndex,tail, AudioSample):
-    current_amplitude_envelope=np.sum(np.abs(hilbert(AudioSample)))
-    if  previous_amplitude_envelope >= current_amplitude_envelope and cond<=5: # need cond three times to have good portion of data
-        currTail=currIndex
-    else :
-        currTail=tail
-        cond+=1
-    return cond, currTail , current_amplitude_envelope
+def EndSegments(previous_amplitude_envelope,current_amplitude_envelope,currIndex,tail):
+		if  previous_amplitude_envelope >= current_amplitude_envelope : # need cond three times to have good portion of data
+			currTail=currIndex
+		else :
+			currTail=tail
+		return  currTail 
 
 
 def logEnergy(frame):

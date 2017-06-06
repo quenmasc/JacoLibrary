@@ -19,7 +19,7 @@ class _Limiter(object):
 		self.__delayLine=np.zeros(self.__delay, 'f')
 		self.__enveloppe=0
 		self.__delayIndex=0
-		self.__threshold=0.1
+		self.__threshold=0.05
 		self.__Timer=0
 		self.__evolve=0
 		

@@ -38,7 +38,7 @@ def MeanStandardDeviation(x, Lambda):
     return np.mean(x)+Lambda*np.std(x)
 
 def EntropyThresholdUpdate(entropyBuffer, lastThreshold, p) :
-       return p*lastThreshold + (1-p)*MeanStandardDeviation(entropyBuffer,3)
+       return p*lastThreshold + (1-p)*MeanStandardDeviation(entropyBuffer,2)
 
 def deltaMFCCs(MFCCs,w):
        hlen=int(np.floor(w/2))

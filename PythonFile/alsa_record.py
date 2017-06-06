@@ -46,11 +46,11 @@ class Record(object) :
 		""""Reads audio from ALSA audio device """
 		def __read(self) :
 			card='sysdefault:CARD=Device'  # define default recording card 
-			inp = alsa.PCM(alsa.PCM_CAPTURE, alsa.PCM_NONBLOCK,card) 
+			inp = alsa.PCM(alsa.PCM_CAPTURE, alsa.PCM_NORMAL,card) 
 			inp.setchannels(1) # number of channels
 			inp.setrate(self.__rate) # sample  rate
 			inp.setformat(self.__format) # format of sample
-			inp.setperiodsize(self.__rate / 10) # buffer period size
+			inp.setperiodsize(self.__rate / 50) # buffer period size
 			print tools.bcolors.OKGREEN + "In alsa_record - Audio Device is correctly parameted" + tools.bcolors.ENDC
         
 
@@ -58,7 +58,7 @@ class Record(object) :
 					frame_count, data = inp.read()  # process to get all value from alsa buffer -> period size * bytes per sample
 					self.__read_queue.put(data) # put data in queue -> string type
 					self.__read_frame.put(frame_count) # put length -> over 0 data else None
-
+				
 
 		def __write(self):
 				card='sysdefault:CARD=Device'
@@ -67,7 +67,7 @@ class Record(object) :
 				outp.setchannels(1)
 				outp.setrate(self.__rate)
 				outp.setformat(alsa.PCM_FORMAT_S16_LE)
-				outp.setperiodsize(2*self.__rate / 10)
+				outp.setperiodsize(self.__rate / 50)
 
 				while True:
 
@@ -81,7 +81,7 @@ class Record(object) :
 		def __pre_post_data(self):
 				zeros = np.zeros(self.__rate / 50, dtype = np.int16)
 
-				for i in range(0, gself.__byte):
+				for i in range(0, self.__byte):
 					self.__write_queue.put(zeros)
 
 
@@ -89,12 +89,12 @@ class Record(object) :
 
 		""" Run proccesses """
 		def run(self):
-        #self.__pre_post_data()
+				self.__pre_post_data()
        # index=Queue()
 				self.__read_process = Process(target=self.__read)
-				self.__write_process = Process(target = self.__write)
+				#self.__write_process = Process(target = self.__write)
 				self.__read_process.start()
-				self.__write_process.start()
+				#self.__write_process.start()
       
 		def runBuffer(self):
 				print tools.bcolors.WARNING + "Data Collector is running" + tools.bcolors.ENDC
