@@ -59,32 +59,12 @@ class Speech_Recognition(object):
 			self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
 			self.__t2=threading.Thread(target=self.SVM)
 			self.__t3=threading.Thread(target=self.VocalActivityDetection)
+			self.__t4=threading.Thread(target=self.Train)
 			self.__t1.start()
 			self.__t2.start()
 			self.__t3.start()
+			self.__t4.start()
 			
-			
-			"""
-					detection=Limit.limit(ndata)
-					if (StartCount!=0 and StartCount <=150 and StartFlag==0):
-						StartCount+=1
-					if (StartFlag==0 and StartCount==0 and StartFlag==0):
-						audio.runBuffer()
-						flag=True
-						StartCount+=1
-					if (StartCount >150 and StartFlag==0):
-						StartFlag=1
-						audio.StopBuffer()
-						flag=False 
-					if (detection==1 and flag==False and StartFlag==1):
-						audio.runBuffer()
-						flag=True
-					elif (detection==0 and flag==True and StartFlag==1) :
-						audio.StopBuffer()
-						flag=False 
-					if (flag==True):
-			"""	
-      
 		def SVM(self):
 			global MfccsCoeff
 			global Data
@@ -231,6 +211,13 @@ class Speech_Recognition(object):
 			for elem in a:
 				s += struct.pack('h', elem)
 			return s
+			
+
+
+		def Train(self):
+				x= raw_input("Class of the current word")
+				print "Labelclass is :" ,x
+			
     
 if __name__=='__main__' :
     print "Running ...."
