@@ -65,10 +65,10 @@ class MFCCs(object):
         self.__win=np.hamming(200)
         
     def magnitude(self, frame):
-        frame =self.pre_emphasis(frame) * self.__win
-        fft=numpy.fft.fft(frame, self.__nfft,axis=0)
+			frame =self.pre_emphasis(frame) * self.__win
+			fft=numpy.fft.fft(frame, self.__nfft,axis=0)
         # Square of absolute value
-        return fft 
+			return fft 
 
     def pre_emphasis(self,frame):
         return np.append(frame[0],frame[1:]-self.__alpha*frame[:-1])

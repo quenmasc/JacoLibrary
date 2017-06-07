@@ -37,7 +37,6 @@ class MFFCsRingBuffer(object):
             self.__Env=Env=Envelope._Envelope()
                 
         def extend(self,data):
-				print self.__index
 				data_index=(self.__index+np.arange(data.size))
 				if np.all(self.__data[data_index]==np.zeros(len(data_index))) :
 						self.__data[data_index]=data

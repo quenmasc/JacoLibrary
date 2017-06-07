@@ -12,6 +12,7 @@ import os
 from threading import Thread , Semaphore
 import alsaaudio as alsa
 import struct
+import DSP
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-06-07"
@@ -24,6 +25,7 @@ class RingBuffer(object):
 		def __init__(self,length,window_sample,step_sample):
 				self.__tail=0
 				self.__head=0
+				self.__flag=0
 				self.__MaxLen=length
 				self.__data=np.zeros(length)
 				self.__window=window_sample
@@ -42,7 +44,7 @@ class RingBuffer(object):
 		def Writer(self,data):
 				with self.__ServiceQueue :
 						self.__RessourceAccess.acquire()
-				print "Write"
+				#print "Write" 
 				self.IsFull_Write(data)
 				self.__RessourceAccess.release()
 			
@@ -51,8 +53,9 @@ class RingBuffer(object):
 				Next=self.__head+len(data)
 				if (Next >= self.__MaxLen):
 						Next =0
+						self.__flag=1
 				if ( Next == self.__tail):
-						print " #######################################Overwrite################################"
+						print " ##### Overwrite #####" , self.__tail , self.__head
 						return -1
 				data_index=(self.__head + np.arange(len(data)))
 				self.__data[data_index]=data
@@ -66,22 +69,26 @@ class RingBuffer(object):
 								self.__RessourceAccess.acquire()
 						self.__readCount+=1
 						self.__ServiceQueue.release()
-				print "Read"
+				#print "Read"
 				self.IsEmpty_Read()
 				with self.__ReadCountAccess :
 						self.__readCount-=1
 						if (self.__readCount ==0):
 								self.__RessourceAccess.release()
 		def IsEmpty_Read(self):
+			#	print self.__head , self.__tail 
 				if (self.__head == self.__tail):
-						print "No Data"
+						#print "No Data"
 						return -1
 				Next=self.__tail+self.__window
-				
 				if ( Next >= self.__MaxLen):
 						Next = Next-self.__MaxLen
-				if (Next == self.__head):
+						self.__flag=0
+				if (Next >= self.__head and self.__flag ==0):
 						return -1
+				if (Next <= self.__head and self.__flag ==1):
+						return -1
+				#print self.__head , self.__tail , Next
 				idx=(self.__tail + np.arange(self.__window))
 				if self.__tail+self.__window >= self.__MaxLen :
 							temp_end=(np.arange(self.__tail,self.__MaxLen))
@@ -91,7 +98,6 @@ class RingBuffer(object):
 				self.__tail+=self.__step
 				if (self.__tail >= self.__MaxLen ):
 						self.__tail = self.__tail - self.__MaxLen
-				print self.__tail
 				return 0
 
 
@@ -107,7 +113,7 @@ class RingBuffer(object):
 				while True :
 						frame_count, data = inp.read()
 						if frame_count :
-							self.__USBData.put(self.pseudonymize(data))
+							self.__USBData.put(DSP.normalize(self.pseudonymize(data), 32768.0))
 
 		def readUSB(self):
 				return self.__USBData.get()
@@ -120,19 +126,20 @@ class RingBuffer(object):
 				self.__read_process = Process(target=self.__readUSB)
 				self.__read_process.start()
 		
+		
+		## test 
 		def Recorder(self):
+				self.run()
 				while True :
 						data=self.readUSB()
 						self.Writer(data)
 			
-		def Traitment(self):
-				while True :
-						time.sleep(0.05)
+		def Treatment(self):
+				
+				while (self.__ReadQueue.empty()):
 						self.Reader()
-						if (self.__ReadQueue.empty()):
-								pass
-						else :
-								a=self.__ReadQueue.get()
+				a= self.__ReadQueue.get()
+				return a
 			
 					
 if __name__=='__main__' :
