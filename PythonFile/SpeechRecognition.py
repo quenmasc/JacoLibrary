@@ -47,7 +47,7 @@ class Speech_Recognition(object):
 			
 			## shared constructor
 			self.__ReadWrite=ReadWriteRingBuffer.RingBuffer(24650,200,80)
-           
+			#self.run()
 		def Recorder(self):
 			
 			## all value 
@@ -57,17 +57,14 @@ class Speech_Recognition(object):
 			#self.__ReadWrite.Recorder()
 			## Thread Launcher
 			
-			#self.__t3=threading.Thread(target=self.VocalActivityDetection)
-			#self.__t3.start()
+			self.__t3=threading.Thread(target=self.VocalActivityDetection)
+			self.__t3.start()
 			self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
 			self.__t1.start()
 			
-			#self.__t2=threading.Thread(target=self.SVM)
-			#self.__t2.start()
+			self.__t2=threading.Thread(target=self.SVM)
+			self.__t2.start()
 			#self.__t4=threading.Thread(target=self.Train)
-			
-			
-			
 			#self.__t4.start()
 			
 		def SVM(self):
@@ -184,12 +181,12 @@ class Speech_Recognition(object):
 							else :
 								
 							# return MFCC and Spectral Entropy background noise
-								mfccNoise=function.updateMFCCsNoise(coeff,mfccNoise, 0.9)
-								entropyNOise=function.updateEntropyNoise(SEntropy,entropyNoise, 0.95)
+								mfccN=function.updateMFCCsNoise(coeff,mfccNoise, 0.9)
+								entropyN=function.updateEntropyNoise(SEntropy,entropyNoise, 0.95)
 						
 							# return correlation and distance of MFCC and Entropy
-								corr=function.correlation_1D(coeff,mfccNoise)
-								entropyDistance=function.distance(SEntropy,entropyNoise)
+								corr=function.correlation_1D(coeff,mfccN)
+								entropyDistance=function.distance(SEntropy,entropyN)
 						
 							# rotate value in entropyData bufferT
 								entropyData.rotate(-1)
@@ -197,12 +194,12 @@ class Speech_Recognition(object):
 							# update threshold 
 
 								th=function.sigmoid(10,5,corr)
-								entropyThreshNoise=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.96)
+								entropyThreshN=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.96)
 
-								fl=buff.flag(corr,th,entropyDistance,entropyThreshNoise,coeff,energy,c)
+								fl=buff.flag(corr,th,entropyDistance,entropyThreshN,coeff,energy,c)
 								#print fl
 								if fl=="admit" :
-										tools.bcolors.OKGREEN + "Detection" + tools.bcolors.ENDC
+										print tools.bcolors.OKGREEN + "Detection" + tools.bcolors.ENDC
 										self.__semaphoreLock.acquire()
 										with self.__lock :
 											MfccsCoeff,Data=buff.get()

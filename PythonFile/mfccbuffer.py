@@ -23,7 +23,7 @@ class MFFCsRingBuffer(object):
         def __init__(self):
             self.__data=np.zeros(2600)
             self.__length=2600
-            self.__lengthMax=1300
+            self.__lengthMax=1560
             self.__index=0
             self.__tail=0
             self.__count=0

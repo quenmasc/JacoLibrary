@@ -132,7 +132,6 @@ class RingBuffer(object):
 		def Recorder(self):
 				self.run()
 				while True :
-						print "lecture"
 						data=self.readUSB()
 						self.Writer(data)
 			
