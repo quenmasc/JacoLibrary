@@ -54,15 +54,20 @@ class Speech_Recognition(object):
 			StartFlag=0
 			StartCount=0
 			flag=False
-			
+			#self.__ReadWrite.Recorder()
 			## Thread Launcher
+			
+			#self.__t3=threading.Thread(target=self.VocalActivityDetection)
+			#self.__t3.start()
 			self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
-			self.__t2=threading.Thread(target=self.SVM)
-			self.__t3=threading.Thread(target=self.VocalActivityDetection)
-			#self.__t4=threading.Thread(target=self.Train)
 			self.__t1.start()
-			self.__t2.start()
-			self.__t3.start()
+			
+			#self.__t2=threading.Thread(target=self.SVM)
+			#self.__t2.start()
+			#self.__t4=threading.Thread(target=self.Train)
+			
+			
+			
 			#self.__t4.start()
 			
 		def SVM(self):
@@ -84,9 +89,6 @@ class Speech_Recognition(object):
 				else :
 					raise
 			print tools.bcolors.OKGREEN + "In SVM Method - All done" + tools.bcolors.ENDC
-		
-        
-        
 			while True :
 					self.__semaphore.acquire()
 					with self.__lock :
@@ -95,13 +97,13 @@ class Speech_Recognition(object):
 					self.__semaphoreLock.release()
 					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T 
 					classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
-					ClassAttributionMatFileclassL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
+					classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
 					print classLab
-					file=wave.open('test.wav','wb')
-					file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
-					file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
-					file.close()
-					##	self.write_Pipe(classL)
+					#file=wave.open('test.wav','wb')
+					#file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
+					#file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
+					#file.close()
+					#self.write_Pipe(classL)
 					print "Done ..."
 				         
 		def write_Pipe(self,classL):
@@ -149,6 +151,7 @@ class Speech_Recognition(object):
 			endpoint=np.empty(2,'f')
 			corr=np.empty((2,1),'f')
 			flag=0
+			print tools.bcolors.OKGREEN + " Traitment is loaded " + tools.bcolors.ENDC
 			while True :
 					c=np.zeros(200)
 					c=np.array(self.__ReadWrite.Treatment())
@@ -181,12 +184,12 @@ class Speech_Recognition(object):
 							else :
 								
 							# return MFCC and Spectral Entropy background noise
-								mfccN=function.updateMFCCsNoise(np.array(coeff),mfccNoise, 0.9)
-								entropyN=function.updateEntropyNoise(SEntropy,entropyNoise, 0.95)
+								mfccNoise=function.updateMFCCsNoise(coeff,mfccNoise, 0.9)
+								entropyNOise=function.updateEntropyNoise(SEntropy,entropyNoise, 0.95)
 						
 							# return correlation and distance of MFCC and Entropy
-								corr=function.correlation_1D(np.array(coeff),mfccN)
-								entropyDistance=function.distance(SEntropy,entropyN)
+								corr=function.correlation_1D(coeff,mfccNoise)
+								entropyDistance=function.distance(SEntropy,entropyNoise)
 						
 							# rotate value in entropyData bufferT
 								entropyData.rotate(-1)
@@ -194,16 +197,15 @@ class Speech_Recognition(object):
 							# update threshold 
 
 								th=function.sigmoid(10,5,corr)
-								entropyThresh=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.96)
+								entropyThreshNoise=function.EntropyThresholdUpdate(entropyData, entropyThreshNoise,0.96)
 
-								fl=buff.flag(corr,th,entropyDistance,entropyThresh,coeff,energy,c)
+								fl=buff.flag(corr,th,entropyDistance,entropyThreshNoise,coeff,energy,c)
 								#print fl
 								if fl=="admit" :
+										tools.bcolors.OKGREEN + "Detection" + tools.bcolors.ENDC
 										self.__semaphoreLock.acquire()
-										#self.__semaphoreLock.acquire()
 										with self.__lock :
 											MfccsCoeff,Data=buff.get()
-										#self.__semaphore.release()
 										self.__semaphore.release()
 						     
     
@@ -222,7 +224,7 @@ class Speech_Recognition(object):
 						self.__semaphore.acquire()
 						with self.__lock :
 								coeff=MfccsCoeff
-						self.__semaphoreLock.release()
+						
 						x= int( raw_input("Class of the current word\n"))
 						print "Labelclass is :" ,x
 						if (x!=0):
@@ -240,7 +242,7 @@ class Speech_Recognition(object):
 								os.chdir('../../')
 						else :
 							pass
-
+						self.__semaphoreLock.release()
     
 if __name__=='__main__' :
     print "Running ...."

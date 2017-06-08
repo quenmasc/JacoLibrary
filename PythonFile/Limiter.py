@@ -31,7 +31,7 @@ class _Limiter(object):
 					
 					self.__enveloppe*=self.__release 
 					self.__enveloppe=max(abs(signal[i]),self.__enveloppe)
-					
+				"""	
 				if(self.__enveloppe >=self.__threshold and self.__Timer!=0 and self.__Timer <=150):
 						self.__Timer=1
 						
@@ -47,9 +47,16 @@ class _Limiter(object):
 						self.__Timer=0
 						
 				return self.__evolve
+				"""		
 						
-						
-						
+	def initialize(self):
+			self.__attack=0.9
+			self.__release=0.999
+			self.__gain=1.0
+			self.__delay=40
+			self.__delayLine=np.zeros(self.__delay, 'f')
+			self.__enveloppe=0
+			self.__delayIndex=0
 						
 					#if self.__enveloppe > self.__threshold :
 					#	gain=(1+self.__threshold-self.__enveloppe)

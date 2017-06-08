@@ -10,7 +10,7 @@ import os
 import function
 import RingBuffer
 from scipy.signal import hilbert
-import Envelope
+import Limiter
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-04-27"
@@ -34,7 +34,7 @@ class MFFCsRingBuffer(object):
             self.__EnergyCoeffArray=np.empty(13,'f')
             self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
             self.__previous_amplitude_envelope=0.
-            self.__Env=Env=Envelope._Envelope()
+            self.__Env=Env=Limiter._Limiter()
                 
         def extend(self,data):
 				data_index=(self.__index+np.arange(data.size))
@@ -102,10 +102,10 @@ class MFFCsRingBuffer(object):
 							self.extend(self.__EnergyCoeffArray)
 							self.__SampleRingBuffer.extendSegments(AudioSample)
 							self.__count=0
-							self.__envelope = self.__Env.UpperSlope(AudioSample)
+							self.__envelope = self.__Env.limit(AudioSample)
 							
 					if self.__flag=="io" :
-							current_Env=self.__Env.UpperSlope(AudioSample)
+							current_Env=self.__Env.limit(AudioSample)
 							self.__tail =DSP.EndSegments(self.__envelope, current_Env,self.__index,self.__tail)
 							self.__envelope=current_Env
 						
