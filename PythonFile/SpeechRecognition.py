@@ -16,7 +16,6 @@ import os
 import time
 import errno
 import Sphere
-import Limiter
 import SpectralSubstraction
 import math
 import wave
@@ -41,6 +40,7 @@ class Speech_Recognition(object):
 			self.__semaphore2Lock=threading.Semaphore(1)
 			self.__semaphore=threading.Semaphore(0)
 			self.__semaphoreLock=threading.Semaphore(1)
+			
 			self.__lock=Lock()
 			self.__lock2 = Lock()
 			self.__fifo_name= 'fifo'
@@ -59,11 +59,11 @@ class Speech_Recognition(object):
 			self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
 			self.__t2=threading.Thread(target=self.SVM)
 			self.__t3=threading.Thread(target=self.VocalActivityDetection)
-			self.__t4=threading.Thread(target=self.Train)
+			#self.__t4=threading.Thread(target=self.Train)
 			self.__t1.start()
 			self.__t2.start()
 			self.__t3.start()
-			self.__t4.start()
+			#self.__t4.start()
 			
 		def SVM(self):
 			global MfccsCoeff
@@ -95,13 +95,13 @@ class Speech_Recognition(object):
 					self.__semaphoreLock.release()
 					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T 
 					classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
-					classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
+					ClassAttributionMatFileclassL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
 					print classLab
 					file=wave.open('test.wav','wb')
 					file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
 					file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
 					file.close()
-					#	self.write_Pipe(classL)
+					##	self.write_Pipe(classL)
 					print "Done ..."
 				         
 		def write_Pipe(self,classL):
@@ -200,8 +200,10 @@ class Speech_Recognition(object):
 								#print fl
 								if fl=="admit" :
 										self.__semaphoreLock.acquire()
+										#self.__semaphoreLock.acquire()
 										with self.__lock :
 											MfccsCoeff,Data=buff.get()
+										#self.__semaphore.release()
 										self.__semaphore.release()
 						     
     
@@ -215,9 +217,30 @@ class Speech_Recognition(object):
 
 
 		def Train(self):
-				x= raw_input("Class of the current word")
-				print "Labelclass is :" ,x
-			
+			global MfccsCoeff
+			while True :
+						self.__semaphore.acquire()
+						with self.__lock :
+								coeff=MfccsCoeff
+						self.__semaphoreLock.release()
+						x= int( raw_input("Class of the current word\n"))
+						print "Labelclass is :" ,x
+						if (x!=0):
+								struct='DataBase/%s'%AudioIO.ClassName(x)
+								if not os.path.exists(struct) :
+										os.makedirs(struct)
+										print tools.bcolors.OKBLUE +"folder :" ,struct, "has been created" + tools.bcolors.ENDC
+								os.chdir(struct)
+								listdirectory = os.listdir(".")
+								name='%s_%s.txt'%(AudioIO.ClassName(x),len(listdirectory))
+								if not os.path.isfile(name):
+										file(name,'a').close()
+										np.savetxt(name,coeff)
+										print tools.bcolors.OKGREEN + "Word %s saved - %s"%(AudioIO.ClassName(x),len(listdirectory))+tools.bcolors.ENDC
+								os.chdir('../../')
+						else :
+							pass
+
     
 if __name__=='__main__' :
     print "Running ...."

@@ -125,7 +125,7 @@ class Sphere_calibration(object):
 		for i in range (0,self.__DataLength):
 			intermediaire=feat_struct[:,(i*self.__prof+np.arange(self.__prof))]
 			features[:,i]=intermediaire.reshape(intermediaire.size, order='F')
-		print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ..." + tools.bcolors.ENDC
+		print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ...\n" + tools.bcolors.ENDC
 					
 					
 		return features

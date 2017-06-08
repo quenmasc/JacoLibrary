@@ -13,6 +13,7 @@ from threading import Thread , Semaphore
 import alsaaudio as alsa
 import struct
 import DSP
+import Limiter
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-06-07"
@@ -61,7 +62,6 @@ class RingBuffer(object):
 				self.__data[data_index]=data
 				self.__head=Next
 				return 0
-		
 		def Reader(self):
 				self.__ServiceQueue.acquire()
 				with self.__ReadCountAccess :
@@ -110,10 +110,11 @@ class RingBuffer(object):
 				inp.setformat(alsa.PCM_FORMAT_S16_LE) # format of sample
 				inp.setperiodsize(8000 / 50) # buffer period size
 				print  "In alsa_record - Audio Device is correctly parameted" 
+				Compressor=Limiter._Limiter()
 				while True :
 						frame_count, data = inp.read()
 						if frame_count :
-							self.__USBData.put(DSP.normalize(self.pseudonymize(data), 32768.0))
+							self.__USBData.put(Compressor.arctan_compressor(DSP.normalize(self.pseudonymize(data), 32768.0)))
 
 		def readUSB(self):
 				return self.__USBData.get()

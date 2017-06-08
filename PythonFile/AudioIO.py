@@ -61,7 +61,7 @@ def ClassAttributionMatFile(endsfile):
 			6 :  'Class_6' ,
 			7 :  'Class_7' ,
 			8 :  'Class_8' ,
-		}.get(endsfile) # zero is default class
+		}.get(endsfile,0) # zero is default class
 
 
 def FindWavFileAndStoreData():
@@ -296,27 +296,7 @@ def train():
     print tools.bcolors.OKGREEN + "All SVM Trained have been saved" + tools.bcolors.ENDC
  
  
-def correl ():
-	Normalization=Sphere.Sphere_calibration()
-	listdirectory = os.listdir(".")
-	data=Normalization.ClassAndFeaturesSplit(np.loadtxt("coeff.out"),"test")
-	for filename in listdirectory:
-			if(FolderClassDictionnary(filename)==7):
-				os.chdir(filename)
-				data_TEST=Normalization.ClassAndFeaturesSplit((np.loadtxt(os.listdir(".")[0])).T,"train")
-				os.chdir('../')
-				mn=np.array([])#.reshape(5850,0)
-				m=np.zeros((5850,data_TEST.shape[1]))
-				for j in range(0,data_TEST.shape[1]):
-					
-					for i in range(0, data.size):
-						m[i,j]=(data[i]-data_TEST[i,j]).T
-				print m.shape ,"\n mean:", np.mean(m,axis=1), "\n std :" , np.std(m,axis=1)
-				np.savetxt('Param.out',(np.mean(m,axis=1), np.std(m, axis=1)))
-				#print "Class :" ,FolderClassDictionnary(filename) ,"\n", "moy : ", mn 
-				
-					#print(pearsonr(data,data_TEST[:,j]))
-					#time.sleep(2)
+
             
             
 if __name__=='__main__' :

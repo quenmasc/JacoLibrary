@@ -4,6 +4,7 @@ import numpy as np
 import math
 import struct
 import array
+from scipy.interpolate import interp1d
 """ Inspired on the work of """
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-05-30"
@@ -14,7 +15,7 @@ class _Limiter(object):
 	def __init__(self):
 		self.__attack=0.9
 		self.__release=0.999
-		self.__gain=1
+		self.__gain=1.0
 		self.__delay=40
 		self.__delayLine=np.zeros(self.__delay, 'f')
 		self.__enveloppe=0
@@ -60,5 +61,15 @@ class _Limiter(object):
 					#signal[i]=self.__delayLine[self.__delayIndex]*self.__gain
 		
 				#return signal
+				
+	def arctan_compressor (self,signal, factor=1):
+			constant = np.linspace(-1,1,170)
+			transfer=np.arctan(factor*constant)
+			transfer/=np.abs(transfer).max()
+			return self.apply_transfer(signal,transfer)
 
+	def apply_transfer (self,signal, transfer, interpolation='linear'):
+			constant=np.linspace(-1,1,len(transfer))
+			interpolator=interp1d(constant, transfer, interpolation)
+			return interpolator(signal)
 	
