@@ -56,7 +56,7 @@ void PythonBridge::finalize_python(){
 void PythonBridge::Running_python(){
 	PyObject_CallMethod(pInstanceSVM,(char*)"Recorder",(char*)"");
 }
-
+/*
 int PythonBridge::ClassValue(){
 	int Classification=0;
 	PyObject *pValue ;
@@ -68,11 +68,13 @@ int PythonBridge::ClassValue(){
 	}
 	return Classification;
 }
-
-void PythonBridge::ClassValue2(){
+*/
+void PythonBridge::Running_SVM(){
 	PyObject_CallMethod(pInstanceSVM,(char*)"SVM",(char*)"");
 }
-
+void PythonBridge::Running_Treatment(){
+	PyObject_CallMethod(pInstanceSVM,(char*)"VocalActivityDetection",(char*)"");
+}
 }
 
 

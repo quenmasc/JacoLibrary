@@ -9,7 +9,7 @@ class PythonBridge {
 		~PythonBridge();
 		void finalize_python();
 		void Running_python();
-		int ClassValue();
-		void ClassValue2();
+		void Running_SVM();
+		void Running_Treatment();
 };
 }
