@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <libkindrv/kindrv.h>
 #include <queue>
+#include <string>
 
 using namespace KinDrv;
 PythonBridge Bridge ;
@@ -116,8 +117,8 @@ goto_home(JacoArm *arm)
 
 void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 	switch (n){
-			case 6 :
-				if(OldClass!=6){
+			case 5 :
+				if(OldClass!=5){
 					jaco_retract_mode_t mode = arm->get_status();
 					arm->release_joystick();
 					while(mode !=MODE_READY_STANDBY){
@@ -188,7 +189,8 @@ void PythonRoutine(){
 
 
 void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue ){
-	sleep(2);
+	sleep(5);
+	std::string keyboard;
 	const char *fifo_name="/home/pi/libkindrv/examples/build/fifo";
 	std::cout << "Pipe is opened" << std::endl;
 	int n;
@@ -207,7 +209,11 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 		data.assign(buf.data(),buf.size());
 	}
 	n=std::stoi(data,nullptr,2);
-	my_queue.push(n);
+	//printf("Current class is %i , Are you agree with ? [Y] or N\n",n);
+	//std::cin >> keyboard;
+	//if ((keyboard=="y" )| (keyboard=="Y")){
+		my_queue.push(n);
+	//}
 }
 }
 }
@@ -287,14 +293,12 @@ int main(){
 	
 
 /*  launch all my thread */
- 
-	printf("threading");
 	std:: thread first(PythonRoutine) ;
 	std:: thread third(PipeClass,arm,axes, std::ref(my_queue));
-	std:: thread dd(Result,std::ref(my_queue),arm, axes);
+//	std:: thread dd(Result,std::ref(my_queue),arm, axes);
 	first.join();
 	third.join();
-	dd.join();
+	//dd.join();
 	return 0 ;
 	
 }
