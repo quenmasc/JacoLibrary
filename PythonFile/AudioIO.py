@@ -191,6 +191,9 @@ def TrainClasse(listOfDirs):
        6 : 'Class_6' ,
        7 : 'Class_7', 
        8 : 'Class_8' ,
+       9 : 'Class_9' ,
+       10: 'Class_10' ,
+       11: 'Class_11' ,
         }.get(listOfDirs,0) # zero is default class
         
 def ClassName(Label):
@@ -202,6 +205,9 @@ def ClassName(Label):
          5 : "GOTO",
          6 : "READY",
          7 : "MODE",
+         9 : "ONE" ,
+         10: "TWO" ,
+         11: "THREE",
         }.get(Label,0)
     
 def FistSVMClass(listOfDirs):

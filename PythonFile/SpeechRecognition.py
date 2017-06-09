@@ -41,7 +41,7 @@ class Speech_Recognition(object):
 			self.__semaphore2Lock=threading.Semaphore(1)
 			self.__semaphore=threading.Semaphore(0)
 			self.__semaphoreLock=threading.Semaphore(1)
-			self.__event=Event()
+			#   self.__event=Event()
 			self.__lock=Lock()
 			self.__lock2 = Lock()
 			self.__fifo_name= 'fifo'
@@ -67,7 +67,7 @@ class Speech_Recognition(object):
 			self.__t4.start()
 			#self.__t2=threading.Thread(target=self.SVM)
 			#self.__t2.start()
-			self.__ReadWrite.Recorder(self.__event)
+			self.__ReadWrite.Recorder()
 		
 			
 		def SVM(self):
@@ -103,7 +103,8 @@ class Speech_Recognition(object):
 					#file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
 					#file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
 					#file.close()
-					#self.write_Pipe(classL)
+					if classL != 8 :
+							self.write_Pipe(classL)
 					print "Done ..."
 				         
 		def write_Pipe(self,classL):
@@ -222,9 +223,9 @@ class Speech_Recognition(object):
 			global Data
 			print tools.bcolors.OKBLUE +"Ready for Training "+ tools.bcolors.ENDC
 			while True :
-						self.__event.set()
+						#self.__event.set()
 						self.__semaphore.acquire()
-						self.__event.clear()
+						#self.__event.clear()
 						with self.__lock :
 								coeff=MfccsCoeff
 								Audio=Data

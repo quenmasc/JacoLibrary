@@ -129,9 +129,9 @@ class RingBuffer(object):
 		
 		
 		## test 
-		def Recorder(self,event):
+		def Recorder(self):
 				while True :
-								event.wait()
+								#event.wait()
 								data=self.readUSB()
 								self.Writer(data)
 			
