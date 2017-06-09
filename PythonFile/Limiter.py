@@ -31,6 +31,7 @@ class _Limiter(object):
 					
 					self.__enveloppe*=self.__release 
 					self.__enveloppe=max(abs(signal[i]),self.__enveloppe)
+					return self.__enveloppe
 				"""	
 				if(self.__enveloppe >=self.__threshold and self.__Timer!=0 and self.__Timer <=150):
 						self.__Timer=1

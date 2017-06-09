@@ -10,6 +10,7 @@ from collections import deque
 import DSP
 import function
 import threading
+from threading import Event
 import MachineLearning
 import tools
 import os
@@ -40,7 +41,7 @@ class Speech_Recognition(object):
 			self.__semaphore2Lock=threading.Semaphore(1)
 			self.__semaphore=threading.Semaphore(0)
 			self.__semaphoreLock=threading.Semaphore(1)
-			
+			self.__event=Event()
 			self.__lock=Lock()
 			self.__lock2 = Lock()
 			self.__fifo_name= 'fifo'
@@ -54,18 +55,20 @@ class Speech_Recognition(object):
 			StartFlag=0
 			StartCount=0
 			flag=False
+			self.__ReadWrite.run()
 			#self.__ReadWrite.Recorder()
 			## Thread Launcher
 			
 			self.__t3=threading.Thread(target=self.VocalActivityDetection)
 			self.__t3.start()
-			self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
-			self.__t1.start()
-			
-			self.__t2=threading.Thread(target=self.SVM)
-			self.__t2.start()
-			#self.__t4=threading.Thread(target=self.Train)
-			#self.__t4.start()
+			#self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
+			#self.__t1.start()
+			self.__t4=threading.Thread(target=self.Train)
+			self.__t4.start()
+			#self.__t2=threading.Thread(target=self.SVM)
+			#self.__t2.start()
+			self.__ReadWrite.Recorder(self.__event)
+		
 			
 		def SVM(self):
 			global MfccsCoeff
@@ -199,7 +202,6 @@ class Speech_Recognition(object):
 								fl=buff.flag(corr,th,entropyDistance,entropyThreshN,coeff,energy,c)
 								#print fl
 								if fl=="admit" :
-										print tools.bcolors.OKGREEN + "Detection" + tools.bcolors.ENDC
 										self.__semaphoreLock.acquire()
 										with self.__lock :
 											MfccsCoeff,Data=buff.get()
@@ -217,15 +219,19 @@ class Speech_Recognition(object):
 
 		def Train(self):
 			global MfccsCoeff
+			global Data
+			print tools.bcolors.OKBLUE +"Ready for Training "+ tools.bcolors.ENDC
 			while True :
+						self.__event.set()
 						self.__semaphore.acquire()
+						self.__event.clear()
 						with self.__lock :
 								coeff=MfccsCoeff
-						
+								Audio=Data
 						x= int( raw_input("Class of the current word\n"))
 						print "Labelclass is :" ,x
 						if (x!=0):
-								struct='DataBase/%s'%AudioIO.ClassName(x)
+								struct='DataBase/%s'%AudioIO.TrainClasse(x)
 								if not os.path.exists(struct) :
 										os.makedirs(struct)
 										print tools.bcolors.OKBLUE +"folder :" ,struct, "has been created" + tools.bcolors.ENDC
@@ -240,6 +246,10 @@ class Speech_Recognition(object):
 						else :
 							pass
 						self.__semaphoreLock.release()
+						#fil=wave.open('test.wav','wb')
+						#fil.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
+						#fil.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
+						#fil.close()
     
 if __name__=='__main__' :
     print "Running ...."

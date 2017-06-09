@@ -180,6 +180,19 @@ def FolderClassDictionnary(listOfDirs):
         'Class_8' : 8,
         }.get(listOfDirs,0) # zero is default class
 
+
+def TrainClasse(listOfDirs):
+     return { 
+       1 : 'Class_1' ,
+       2 : 'Class_2' ,
+       3 : 'Class_3' ,
+       4 :'Class_4' ,
+       5 : 'Class_5', 
+       6 : 'Class_6' ,
+       7 : 'Class_7', 
+       8 : 'Class_8' ,
+        }.get(listOfDirs,0) # zero is default class
+        
 def ClassName(Label):
      return { 
          1 : "BACKWARD",

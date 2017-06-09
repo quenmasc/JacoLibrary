@@ -129,11 +129,11 @@ class RingBuffer(object):
 		
 		
 		## test 
-		def Recorder(self):
-				self.run()
+		def Recorder(self,event):
 				while True :
-						data=self.readUSB()
-						self.Writer(data)
+								event.wait()
+								data=self.readUSB()
+								self.Writer(data)
 			
 		def Treatment(self):
 				
