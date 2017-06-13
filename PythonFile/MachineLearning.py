@@ -36,10 +36,17 @@ def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
 		#P2=classifierL.predict_proba(Vector)
 		elif R1 == 2 :
 			R2=classifierR.predict((Vector[0][(0+np.arange(3900))]).reshape(1,-1))
+		#elif R1 == 3 :
+		#	R2=classifierC.predict((Vector[0][(0+np.arange(3900))]).reshape(1,-1))
        # P2=classifierR.predict_proba((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
 		else :
 			R2=[8.]
 		return R1 , R2 
+
+def NumberClassifierWrapper(classifierC, Vector):
+		R1=-1
+		R1=classifierC.predict((Vector[0][(0+np.arange(3900))]).reshape(1,-1))
+		return [4.] ,R1
 
 def TrainBestParams(params,features,classLabel):
     svm=OneVsRestClassifier(SVC(probability=True, **params))

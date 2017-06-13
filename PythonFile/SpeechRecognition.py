@@ -63,10 +63,10 @@ class Speech_Recognition(object):
 			self.__t3.start()
 			#self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
 			#self.__t1.start()
-			self.__t4=threading.Thread(target=self.Train)
-			self.__t4.start()
-			#self.__t2=threading.Thread(target=self.SVM)
-			#self.__t2.start()
+			#self.__t4=threading.Thread(target=self.Train)
+			#self.__t4.start()
+			self.__t2=threading.Thread(target=self.SVM)
+			self.__t2.start()
 			self.__ReadWrite.Recorder()
 		
 			
@@ -76,6 +76,7 @@ class Speech_Recognition(object):
 			self.__svm=AudioIO.LoadClassifier("SVM_Trained")
 			self.__svmL=AudioIO.LoadClassifier("LeftSVM_Trained")
 			self.__svmR=AudioIO.LoadClassifier("RightSVM_Trained")
+			self.__svmC=AudioIO.LoadClassifier("NumberSVM_Trained")
 			CoeffSphere=Sphere.Sphere_calibration();
 			try :
 				os.remove('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name)
@@ -89,15 +90,23 @@ class Speech_Recognition(object):
 				else :
 					raise
 			print tools.bcolors.OKGREEN + "In SVM Method - All done" + tools.bcolors.ENDC
+			ChangeSVM= False 
 			while True :
 					self.__semaphore.acquire()
 					with self.__lock :
-							MfccsCoeffGet=MfccsCoeff
+							MfccsCoeffGet=MfccsCoeff 
 							Audio=Data
 					self.__semaphoreLock.release()
 					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T 
-					classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
-					classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
+					if not ChangeSVM :
+						classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,newcoeff)
+						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
+						if classL==7 :
+							ChangeSVM=True
+					else :
+						classLab=MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)
+						classL=int(MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)[1][0])
+						ChangeSVM=False
 					print classLab
 					#file=wave.open('test.wav','wb')
 					#file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
@@ -105,7 +114,7 @@ class Speech_Recognition(object):
 					#file.close()
 					if classL != 8 :
 							self.write_Pipe(classL)
-					print "Done ..."
+					#print "Done ..."
 				         
 		def write_Pipe(self,classL):
 			with open('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name,'wb') as f:
@@ -174,7 +183,7 @@ class Speech_Recognition(object):
 									entropyData=deque([])
 									for k in range(0,len(Data)) :
 										entropyData.append(function.distance(Data[k],entropyNoise))
-									entropyThreshNoise =function.MeanStandardDeviation(entropyData,3)
+									entropyThreshNoise =function.MeanStandardDeviation(entropyData,2)
 									print tools.bcolors.OKBLUE + "Recording is now allowed" +tools.bcolors.ENDC
 									n=deque([])
 									for i in range(0,20):
