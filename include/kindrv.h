@@ -84,9 +84,13 @@ class JacoArm
   jaco_position_t get_ang_current();
   jaco_position_t get_ang_current_motor();
   jaco_sensor_info_t get_sensor_info();
-
+  
   jaco_client_config_t get_client_config(bool refresh=true);
   jaco_retract_mode_t get_status();
+  
+  // add by Quentin
+  jaco_joystick_t get_button_info();
+  // end of adding
 
   // setter; sending basic commands
   void set_control_ang();
@@ -140,7 +144,9 @@ class JacoArm
   error_t _update_client_config();
 
   error_t _send_basic_traj(jaco_basic_traj_point_t &traj);
-
+ // add by Quentin
+  error_t _get_button_info(jaco_joystick_t &joystick);
+ // end of adding
 
 };
 

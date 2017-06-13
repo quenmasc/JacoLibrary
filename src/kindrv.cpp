@@ -169,7 +169,7 @@ get_connected_devs()
     int r = libusb_get_device_descriptor(dev, &desc);
     if (r < 0)
       throw KinDrvException("Failed to get device descriptor, libusb error");
-
+ 
     // if device is a JacoArm, we store information about it
     if( (desc.idVendor == VENDOR_ID) && (desc.idProduct == PRODUCT_ID) ) {
       usb_device_t arm;
@@ -373,7 +373,7 @@ JacoArm::_cmd_out(short cmd)
   _usb_header(p, 1, 1, cmd, 1);
 
   boost::lock_guard<boost::mutex> lock(__lock);
-
+ 
   r = _usb_out(p, transferred);
   if( r < 0 )
     return ERROR_USB_INTERRUPT;
@@ -494,6 +494,25 @@ JacoArm::_flush()
 /* /================================================\
  *   Jaco specific commands (private)
  * \================================================/ */
+ 
+ /* add by Quentin -> get_button_info */
+error_t
+JacoArm::_get_button_info(jaco_joystick_t &joystick)
+{
+  usb_packet_t p;
+  _usb_header(p, 1, 1, CMD_JOYSTICK,1);
+
+  error_t e = _cmd_out_in(p);
+  if( e == ERROR_NONE )
+  {
+    memcpy(&(joystick.button), p.body + 6, sizeof(joystick.button));
+  }
+ // print_message(p);
+  return e ;
+}
+ 
+ /* end of adding */
+ 
 error_t
 JacoArm::_get_cart_pos(jaco_position_t &pos)
 {
@@ -812,7 +831,6 @@ JacoArm::set_control_ang()
   if( e != ERROR_NONE )
     throw KinDrvException("Could not set angular control! libusb error.");
 }
-
 /** Set arm control type to cartesian control. */
 void
 JacoArm::set_control_cart()
@@ -1040,6 +1058,25 @@ JacoArm::get_status()
   return mode;
 }
 
+
+
+ /* ADD by Quentin */
+ /** Get current angular position of Jaco arm.
+ * @return position struct that contains the current joint values
+ */
+jaco_joystick_t
+JacoArm::get_button_info()
+{
+  jaco_joystick_t joystick;
+  error_t e = _get_button_info(joystick);
+  if( e == ERROR_CMD_ID_MISMATCH )
+    throw KinDrvException(e, "Could not get button value, received packet with wrong CMD_ID.");
+  else if( e != ERROR_NONE )
+    throw KinDrvException(e, "Could not get button value! libusb error.");
+
+  return joystick;
+}
+/* end of adding */
 /** Simulate a push of a joystick button.
  * The button is held until the user calls a relase_joystick()!!
  * @param id The id of the joystick (from 0 to 15)
