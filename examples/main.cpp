@@ -15,8 +15,9 @@ using namespace KinDrv;
 PythonBridge Bridge ;
 bool flag_Mode =false ;
 bool flag_Goto = false ;
-int last_Mode_Call =9;
-int before_Mode_3_call=0;
+int last_Mode_Call =14;
+int before_Mode_3_call=16;
+int OpenClose=1 ;
 /* JACO ARM INITIALIZATION */
 
 int
@@ -135,40 +136,32 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 					arm->release_joystick();
 				}
 				break;
-			case 7 :
-				if (OldClass !=7){
-					flag_Mode=true ;
-					
-					
-				}
-				break ;
-			case 9 :
-				if (flag_Mode==true){
-							switch (last_Mode_Call){
-								case 9 :
-										last_Mode_Call=9;
+			case 16 :
+						switch (last_Mode_Call){
+								case 16 :
+										last_Mode_Call=16;
 										flag_Mode=false;
 										break ;
-								case 10 : 
+								case 17 : 
 										arm->release_joystick();
 										usleep(50000);
 										arm->push_joystick_button(0);
 										usleep(50000);
 										arm->release_joystick();
 										usleep(50000);
-										last_Mode_Call=9;
+										last_Mode_Call=16;
 										flag_Mode=false;
 										printf("Mode one selected\n");
 										break ;
-								case 11 :
-										if (before_Mode_3_call==9){
+								default :
+										if (before_Mode_3_call==16){
 												arm->release_joystick();
 												usleep(50000);
 												arm->push_joystick_button(0);
 												usleep(50000);
 												arm->release_joystick();
 												usleep(50000);
-												last_Mode_Call=9;
+												last_Mode_Call=16;
 												flag_Mode=false;
 												printf("Mode one selected\n");
 												break ;
@@ -184,45 +177,40 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 												usleep(50000);
 												arm->release_joystick();
 												usleep(50000);
-												last_Mode_Call=9;
+												last_Mode_Call=16;
 												flag_Mode=false;
 												printf("Mode one selected\n");
 												break ;
 											}
 							}
 				
-						}
-				
 				break;
-			case 10 :
-					
-					if (flag_Mode==true){
+			case 17 :
 							switch (last_Mode_Call){
-								case 10 :
-										last_Mode_Call=10;
+								case 17 :
+										last_Mode_Call=17;
 										flag_Mode=false;
 										break ;
-								case 9 : 
+								case 16 : 
 										arm->release_joystick();
 										usleep(50000);
 										arm->push_joystick_button(0);
 										usleep(50000);
 										arm->release_joystick();
 										usleep(50000);
-										last_Mode_Call=10;
+										last_Mode_Call=17;
 										flag_Mode=false;
-					
-					printf("Mode two selected\n");
+										printf("Mode two selected\n");
 										break ;
-								case 11 : 
-										if (before_Mode_3_call==10){
+								default : 
+										if (before_Mode_3_call==17){
 												arm->release_joystick();
 												usleep(50000);
 												arm->push_joystick_button(0);
 												usleep(50000);
 												arm->release_joystick();
 												usleep(50000);
-												last_Mode_Call=10;
+												last_Mode_Call=17;
 												flag_Mode=false;
 												printf("Mode two selected\n");
 												break ;
@@ -238,52 +226,115 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 												usleep(50000);
 												arm->release_joystick();
 												usleep(50000);
-												last_Mode_Call=10;
+												last_Mode_Call=17;
 												flag_Mode=false;
 												printf("Mode two selected\n");
 												break ;
 											}
 							}
-					
-						}
-				
 				break ;
-			case 11 :
-				if (flag_Mode==true){
-							switch (last_Mode_Call){
-								case 11 :
-										last_Mode_Call=11;
+			case 14 :
+						switch (last_Mode_Call){
+								case 14 :
+										last_Mode_Call=14;
+										switch (OpenClose){
+												case 0 : 
+													flag_Mode=false;
+													OpenClose=1;
+													break ;
+												case 1 :
+													axes.trans_lr +=0.5;
+													arm->move_joystick_axis(axes);
+													usleep(1000);
+													arm->release_joystick();
+													flag_Mode=false;
+													break ;
+												}
+										break ;
+								case 15 :
+										last_Mode_Call=14;
+										OpenClose=1;
 										flag_Mode=false;
 										break ;
-								case 9 :
+								case 16 :
 										arm->release_joystick();
 										usleep(50000);
 										arm->push_joystick_button(1);
 										usleep(50000);
 										arm->release_joystick();
 										usleep(50000);
-										last_Mode_Call=11;
+										last_Mode_Call=14;
 										flag_Mode=false;
-										before_Mode_3_call=9;
+										before_Mode_3_call=16;
 										printf("Mode three selected\n");
 										break ;
 										
-								case 10 :
+								case 17 :
 										arm->release_joystick();
 										usleep(50000);
 										arm->push_joystick_button(1);
 										usleep(50000);
 										arm->release_joystick();
 										usleep(50000);
-										last_Mode_Call=11;
+										last_Mode_Call=14;
 										flag_Mode=false;
-										before_Mode_3_call=10;
+										before_Mode_3_call=17;
 										printf("Mode three selected\n");
 										break ;
 										
 							}
-							
-					}
+				break ;
+				
+				case 15 :
+						switch (last_Mode_Call){
+								case 14 :
+										last_Mode_Call=15;
+										flag_Mode=false;
+										OpenClose=0;
+										break ;
+								case 15 :
+										last_Mode_Call=15;
+										switch (OpenClose){
+												case 1 : 
+													flag_Mode=false;
+													OpenClose=0;
+													break ;
+												case 0 :
+													axes.trans_lr -=0.5;
+													arm->move_joystick_axis(axes);
+													usleep(1000);
+													arm->release_joystick();
+													flag_Mode=false;
+													break ;
+												}
+										break ;
+								case 16 :
+										arm->release_joystick();
+										usleep(50000);
+										arm->push_joystick_button(1);
+										usleep(50000);
+										arm->release_joystick();
+										usleep(50000);
+										last_Mode_Call=15;
+										flag_Mode=false;
+										before_Mode_3_call=16;
+										printf("Mode three selected 16 \n");
+										break ;
+										
+								case 17 :
+										arm->release_joystick();
+										usleep(50000);
+										arm->push_joystick_button(1);
+										usleep(50000);
+										arm->release_joystick();
+										usleep(50000);
+										last_Mode_Call=15;
+										flag_Mode=false;
+										before_Mode_3_call=17;
+										printf("Mode three selected 17\n");
+										break ;
+										
+							}
 				
 				break ;
 			case 1 :
@@ -307,7 +358,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 					axes.trans_lr +=0.5;
 					arm->move_joystick_axis(axes);
 					
-usleep(1000);
+					usleep(1000);
 					arm->release_joystick();
 			//	}
 			break;
