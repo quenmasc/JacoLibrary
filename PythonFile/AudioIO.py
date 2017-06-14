@@ -209,7 +209,38 @@ def ClassName(Label):
          5 : "GOTO",
          6 : "READY",
          7 : "MODE",
+         8 : "NOISE" ,
+         9 : "ONE",
+         10: "TWO",
+         11: "THREE",
+         12: "UP",
+         13: "DOWN",
+         14: "OPEN",
+         15: "CLOSE",
+         16: "TRANSLATION",
+         17: "ROTATION",
         }.get(Label,0)
+
+def TrainClasse(listOfDirs):
+     return { 
+         1 : "Class_1",
+         2 : "Class_2",
+         3 : "Class_3",
+         4 : "Class_4" ,
+         5 : "Class_5",
+         6 : "Class_6",
+         7 : "Class_7",
+         8 : "Class_8" ,
+         9 : "Class_9",
+         10: "Class_10",
+         11: "Class_11",
+         12: "Class_12",
+         13: "Class_13",
+         14: "Class_14",
+         15: "Class_15",
+         16: "Class_16",
+         17: "Class_17",
+        }.get(listOfDirs,0)
     
 def FirstSVMClass(listOfDirs):
      return { 
@@ -229,7 +260,7 @@ def FirstSVMClass(listOfDirs):
         'Class_14' :1,
         'Class_15' :2,
         'Class_16' :3,
-        'Class_17' :2,
+        'Class_17' :3,
         
         }.get(listOfDirs,0) # zero is default class
 
@@ -312,7 +343,7 @@ def SaveClassifier(modelName,svmClassifier):
     
 def LoadClassifier(SVMModelName):
     try : 
-        model=joblib.load("SVModel/%s.pkl"%SVMModelName)
+        model=joblib.load("/home/pi/libkindrv/PythonFile/SVModel/%s.pkl"%SVMModelName)
         print tools.bcolors.OKGREEN + "Classifier loaded %s"%SVMModelName + tools.bcolors.ENDC
         return model
     except IOError :

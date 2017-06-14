@@ -39,9 +39,9 @@ class MidpointNormalize(Normalize):
         x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
         return np.ma.masked_array(np.interp(value, x, y))
         
-def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
+def ClassifierWrapper(classifier,classifierL,classifierR,classifierC, Vector):
 		R1=-1
-		P1=-1
+		R2=-1
 		R1=classifier.predict(Vector)
     #P1=classifier.predict_proba(Vector)
 		if R1 == 1 :
@@ -51,6 +51,11 @@ def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
 			Vector =np.array(Vector)
 			R2=classifierR.predict((Vector[0][(0+np.arange(3900))]).reshape(1,-1))
 		#P2=classifierR.predict_proba((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
+		elif R1==3 :
+			R2=classifierC.predict(Vector)
+		else :
+			R2=[8.]
+		
 		return R1 , R2 
 
 def TrainBestParams(params,features,classLabel):
