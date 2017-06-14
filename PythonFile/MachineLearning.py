@@ -12,10 +12,10 @@ import sklearn.svm
 import sklearn.decomposition
 import sklearn.ensemble
 from sklearn.svm import SVC
-from sklearn.grid_search import GridSearchCV
-from sklearn.cross_validation import train_test_split
-from sklearn.cross_validation import StratifiedShuffleSplit
-from sklearn.cross_validation import StratifiedKFold
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import StratifiedKFold
 from sklearn.multiclass import OneVsRestClassifier, OutputCodeClassifier
 import tools
 import numpy as np
@@ -42,8 +42,6 @@ class MidpointNormalize(Normalize):
 def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
 		R1=-1
 		P1=-1
-		R2=-1
-		P2=-1
 		R1=classifier.predict(Vector)
     #P1=classifier.predict_proba(Vector)
 		if R1 == 1 :
@@ -51,9 +49,9 @@ def ClassifierWrapper(classifier,classifierL,classifierR, Vector):
        # P2=classifierL.predict_proba(Vector)
 		elif R1 == 2 :
 			Vector =np.array(Vector)
-			R2=classifierR.predict((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
+			R2=classifierR.predict((Vector[0][(0+np.arange(3900))]).reshape(1,-1))
 		#P2=classifierR.predict_proba((Vector[0][(0+np.arange(3120))]).reshape(1,-1))
-		return R1 , R2 , P1 , P2
+		return R1 , R2 
 
 def TrainBestParams(params,features,classLabel):
 		svm=(SVC(probability=True, kernel="rbf",**params))

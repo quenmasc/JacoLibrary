@@ -76,7 +76,7 @@ class Speech_Recognition(object):
 			self.__svm=AudioIO.LoadClassifier("SVM_Trained")
 			self.__svmL=AudioIO.LoadClassifier("LeftSVM_Trained")
 			self.__svmR=AudioIO.LoadClassifier("RightSVM_Trained")
-			self.__svmC=AudioIO.LoadClassifier("NumberSVM_Trained")
+			#self.__svmC=AudioIO.LoadClassifier("NumberSVM_Trained")
 			CoeffSphere=Sphere.Sphere_calibration();
 			try :
 				os.remove('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name)
@@ -104,8 +104,8 @@ class Speech_Recognition(object):
 						if classL==7 :
 							ChangeSVM=True
 					else :
-						classLab=MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)
-						classL=int(MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)[1][0])
+						#classLab=MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)
+						#classL=int(MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)[1][0])
 						ChangeSVM=False
 					print classLab
 					#file=wave.open('test.wav','wb')
