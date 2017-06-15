@@ -76,7 +76,7 @@ class Speech_Recognition(object):
 			self.__svm=AudioIO.LoadClassifier("SVM_Trained")
 			self.__svmL=AudioIO.LoadClassifier("LeftSVM_Trained")
 			self.__svmR=AudioIO.LoadClassifier("RightSVM_Trained")
-			self.__svmC=AudioIO.LoadClassifier("NumberSVM_Trained")
+			#self.__svmC=AudioIO.LoadClassifier("NumberSVM_Trained")
 			CoeffSphere=Sphere.Sphere_calibration();
 			try :
 				os.remove('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name)
@@ -99,15 +99,15 @@ class Speech_Recognition(object):
 					self.__semaphoreLock.release()
 					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T 
 					if not ChangeSVM :
-						classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,self.__svmC,newcoeff)
-						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,self.__svmC,newcoeff)[1][0])
+						#classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,self.__svmC,newcoeff)
+						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
 						if classL==7 :
 							ChangeSVM=True
 					else :
 						#classLab=MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)
 						#classL=int(MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)[1][0])
 						ChangeSVM=False
-					print classLab
+					print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
 					#file=wave.open('test.wav','wb')
 					#file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
 					#file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
@@ -180,10 +180,10 @@ class Speech_Recognition(object):
 									mfccNoise=mfccNoise/100
 									entropyNoise = np.mean(entropyData)
 									Data=entropyData
-									entropyData=deque([])
+									entropyData=deque([]) 
 									for k in range(0,len(Data)) :
 										entropyData.append(function.distance(Data[k],entropyNoise))
-									entropyThreshNoise =function.MeanStandardDeviation(entropyData,2)
+									entropyThreshNoise =function.MeanStandardDeviation(entropyData,3)
 									print tools.bcolors.OKBLUE + "Recording is now allowed" +tools.bcolors.ENDC
 									n=deque([])
 									for i in range(0,20):

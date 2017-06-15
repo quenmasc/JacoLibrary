@@ -74,6 +74,8 @@ class MFFCsRingBuffer(object):
 
         def flag(self,data,threshold,entropyDistance,entropyThresh,coeff,energy, AudioSample):
                 # first case
+					if self.__index==self.__length:
+									self.__flag="done"
 					if (data<threshold or entropyDistance<entropyThresh)  and self.__flag=="rejeted" :
 									self.__flag="out"
                         

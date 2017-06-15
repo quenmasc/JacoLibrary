@@ -219,6 +219,7 @@ def ClassName(Label):
          15: "CLOSE",
          16: "TRANSLATION",
          17: "ROTATION",
+         18: "STOP",
         }.get(Label,0)
 
 def TrainClasse(listOfDirs):
@@ -240,6 +241,7 @@ def TrainClasse(listOfDirs):
          15: "Class_15",
          16: "Class_16",
          17: "Class_17",
+         18: "Class_18",
         }.get(listOfDirs,0)
     
 def FirstSVMClass(listOfDirs):
