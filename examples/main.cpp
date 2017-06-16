@@ -13,11 +13,11 @@
 
 using namespace KinDrv;
 PythonBridge Bridge ;
-bool flag_Mode =false ;
+int flag_Mode =false ;
 bool flag_Goto = false ;
-int last_Mode_Call =14;
-int before_Mode_3_call=16;
-int OpenClose=1 ;
+int last_Mode_Call =16;
+int before_Mode_3_call=0 ;
+int OpenClose=1;
 /* JACO ARM INITIALIZATION */
 
 int
@@ -373,6 +373,10 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 			case 12 :
 					axes.trans_rot +=0.5;
 					arm->move_joystick_axis(axes);
+					usleep(1000);
+					arm->release_joystick();
+			break ;
+			case 18 :
 					usleep(1000);
 					arm->release_joystick();
 			break ;
