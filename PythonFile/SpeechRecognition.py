@@ -112,8 +112,8 @@ class Speech_Recognition(object):
 					#file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
 					#file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
 					#file.close()
-					if classL != 8 :
-							self.write_Pipe(classL)
+					#-*if classL != 8 :
+					#		self.write_Pipe(classL)
 					#print "Done ..."
 				         
 		def write_Pipe(self,classL):
@@ -222,7 +222,7 @@ class Speech_Recognition(object):
 		def depseudonymize(self, a):
 			s = ""
 			for elem in a:
-				s += struct.pack('h', elem)
+				s += struct.pack('h', el aem)
 			return s
 			
 
