@@ -195,6 +195,37 @@ def FolderClassDictionnary(listOfDirs):
         'Class_18':12,
         }.get(listOfDirs,0) # zero is default class
 
+def FolderClassDictionnary2(listOfDirs):
+     return { 
+        'Class_1' : 1,
+        'Class_2' : 2,
+        'Class_3' : 3,
+        'Class_4' : 4,
+        'Class_6' : 5,
+        'Class_12': 6,
+        'Class_13': 7,
+        'Class_14': 8,
+        'Class_15': 9,
+        'Class_16':10,
+        'Class_17':11,
+        'Class_18':12,
+        }.get(listOfDirs,0) # zero is default class
+
+def InvertClass(Label):
+		return { 
+			1 :1,
+			2 : 2,
+			3 : 3,
+			4 : 4,
+			6 : 5,
+			12 : 6,
+			13 : 7,
+			14 : 8,
+			15 : 9,
+			16 : 10,
+			17 : 11,
+			18 : 12,
+        }.get(Label,0)
 def ClassName(Label):
      return { 
          1 : "BACKWARD",

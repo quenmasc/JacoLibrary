@@ -13,11 +13,13 @@ class bcolors :
 def printProgressBar(iteration,total,prefix='',suffix='',decimals=1, length=100, fill='*'):#u"\x219"):
 		percent=("{0:."+str(decimals)+"f}").format(100*(iteration/float(total)))
 		filledLength=int(length*iteration//total)
+		if iteration == total:
+			suffix=bcolors.OKGREEN + suffix + bcolors.ENDC
 		bar=fill*filledLength+'-'*(length-filledLength)
 		sys.stdout.write('\r%s |%s| %s%% %s\r' %(prefix, bar, percent,suffix))
 		sys.stdout.flush()
 		if iteration==total:
-				print()
+				sys.stdout.write('\n')
 
 from time import sleep
 import os, sys

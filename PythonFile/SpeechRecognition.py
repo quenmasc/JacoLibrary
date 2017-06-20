@@ -63,10 +63,10 @@ class Speech_Recognition(object):
 			self.__t3.start()
 			#self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
 			#self.__t1.start()
-			#self.__t4=threading.Thread(target=self.Train)
-			#self.__t4.start()
-			self.__t2=threading.Thread(target=self.SVM)
-			self.__t2.start()
+			self.__t4=threading.Thread(target=self.Train)
+			self.__t4.start()
+			#self.__t2=threading.Thread(target=self.SVM)
+			#self.__t2.start()
 			self.__ReadWrite.Recorder()
 		
 			
@@ -222,7 +222,7 @@ class Speech_Recognition(object):
 		def depseudonymize(self, a):
 			s = ""
 			for elem in a:
-				s += struct.pack('h', el aem)
+				s += struct.pack('h', elem)
 			return s
 			
 
@@ -241,7 +241,7 @@ class Speech_Recognition(object):
 						x= int( raw_input("Class of the current word\n"))
 						print "Labelclass is :" ,x
 						if (x!=0):
-								struct='DataBase/%s'%AudioIO.TrainClasse(x)
+								struct='Calibration/Guillaume/%s'%AudioIO.TrainClasse(x)
 								if not os.path.exists(struct) :
 										os.makedirs(struct)
 										print tools.bcolors.OKBLUE +"folder :" ,struct, "has been created" + tools.bcolors.ENDC
@@ -252,7 +252,7 @@ class Speech_Recognition(object):
 										file(name,'a').close()
 										np.savetxt(name,coeff)
 										print tools.bcolors.OKGREEN + "Word %s saved - %s"%(AudioIO.ClassName(x),len(listdirectory))+tools.bcolors.ENDC
-								os.chdir('../../')
+								os.chdir('../../../')
 						else :
 							pass
 						self.__semaphoreLock.release()
