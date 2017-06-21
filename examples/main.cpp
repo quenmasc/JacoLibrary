@@ -17,7 +17,7 @@ int flag_Mode =false ;
 bool flag_Goto = false ;
 int last_Mode_Call =16;
 int before_Mode_3_call=0 ;
-int OpenClose=1;
+int OpenClose=0;
 /* JACO ARM INITIALIZATION */
 
 int
