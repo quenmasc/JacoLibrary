@@ -34,7 +34,7 @@ class MFFCsRingBuffer(object):
             self.__numberOfWindowRejection=40 # 1600 samples -> need to modify it eventually
             self.__lengthOfWindowMinima=300 # need to adapt this value 10*13
             self.__EnergyCoeffArray=np.empty(13,'f')
-            self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
+         #   self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
             self.__previous_amplitude_envelope=0.
             self.__Env=Env=Limiter._Limiter()
             self.__Lock=Lock()
@@ -74,7 +74,7 @@ class MFFCsRingBuffer(object):
 					self.__index=0
 					self.__tail=0
 					self.__out="out"
-					return np.concatenate((mfccs_reshape,np.zeros(self.__lengthMax*3-mfccs_reshape.size)),axis=0),self.__SampleRingBuffer.getSegments(len(idx)/13)
+					return np.concatenate((mfccs_reshape,np.zeros(self.__lengthMax*3-mfccs_reshape.size)),axis=0)#,self.__SampleRingBuffer.getSegments(len(idx)/13)
 
         def flag(self,data,threshold,entropyDistance,entropyThresh,coeff,energy, AudioSample):
                 # first case
@@ -83,12 +83,12 @@ class MFFCsRingBuffer(object):
 					if (data<threshold or entropyDistance<entropyThresh)  and self.__flag=="rejeted" :
 									self.__flag="out"
                         
-					if (data<threshold or entropyDistance<entropyThresh) and self.__flag=="admit" :
+					if  self.__flag=="admit" :
 									self.__flag="out"
                         
 					if (data>=threshold and entropyDistance>=entropyThresh) and self.__flag=="out" :
 								self.__flag="in"
-								self.__SampleRingBuffer.initialize()
+							#	self.__SampleRingBuffer.initialize()
 								self.__Env.initialize()
                         
 					if (data<threshold and entropyDistance<entropyThresh) and self.__flag=="in" :
@@ -106,7 +106,7 @@ class MFFCsRingBuffer(object):
 							
 							self.__tail=self.__index
 							self.extend(self.__EnergyCoeffArray)
-							self.__SampleRingBuffer.extendSegments(AudioSample)
+							#self.__SampleRingBuffer.extendSegments(AudioSample)
 							self.__count=0
 							self.__envelope = self.__Env.limit(AudioSample)
 							
@@ -118,7 +118,7 @@ class MFFCsRingBuffer(object):
 							if self.__count <=self.__numberOfWindowRejection :
 									self.__count+=1
 									self.extend( self.__EnergyCoeffArray)
-									self.__SampleRingBuffer.extendSegments(AudioSample)
+									#self.__SampleRingBuffer.extendSegments(AudioSample)
 							else :
 									delete_index=(self.__tail+np.arange(self.__index-self.__tail))
 									self.__data[delete_index]=0.

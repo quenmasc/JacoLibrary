@@ -95,23 +95,10 @@ class Speech_Recognition(object):
 					self.__semaphore.acquire()
 					with self.__lock :
 							MfccsCoeffGet=MfccsCoeff 
-							Audio=Data
 					self.__semaphoreLock.release()
 					newcoeff=(CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test")).T 
-					if not ChangeSVM :
-						#classLab=MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR ,self.__svmC,newcoeff)
-						classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
-						if classL==7 :
-							ChangeSVM=True
-					else :
-						#classLab=MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)
-						#classL=int(MachineLearning.NumberClassifierWrapper(self.__svmC,newcoeff)[1][0])
-						ChangeSVM=False
+					classL=int(MachineLearning.ClassifierWrapper(self.__svm, self.__svmL, self.__svmR,newcoeff)[1][0])
 					print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
-					#file=wave.open('test.wav','wb')
-					#file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
-					#file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
-					#file.close()
 					#if classL != 8 :
 					#		self.write_Pipe(classL)
 					#print "Done ..."
@@ -214,7 +201,7 @@ class Speech_Recognition(object):
 								if fl=="admit" :
 										self.__semaphoreLock.acquire()
 										with self.__lock :
-											MfccsCoeff,Data=buff.get()
+											MfccsCoeff=buff.get()
 										self.__semaphore.release()
 						     
     
