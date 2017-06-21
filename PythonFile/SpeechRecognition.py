@@ -62,11 +62,11 @@ class Speech_Recognition(object):
 			self.__t3=threading.Thread(target=self.VocalActivityDetection)
 			self.__t3.start()
 			#self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
-			#self.__t1.start()
-			self.__t4=threading.Thread(target=self.Train)
-			self.__t4.start()
-			#self.__t2=threading.Thread(target=self.SVM)
-			#self.__t2.start()
+			##self.__t1.start()
+			#self.__t4=threading.Thread(target=self.Train)
+			#self.__t4.start()
+			self.__t2=threading.Thread(target=self.SVM)
+			self.__t2.start()
 			self.__ReadWrite.Recorder()
 		
 			
@@ -112,7 +112,7 @@ class Speech_Recognition(object):
 					#file.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
 					#file.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
 					#file.close()
-					#-*if classL != 8 :
+					#if classL != 8 :
 					#		self.write_Pipe(classL)
 					#print "Done ..."
 				         

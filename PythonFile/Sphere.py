@@ -63,29 +63,31 @@ class Sphere_calibration(object):
 			cPickle.dump(stdz,fo,protocol=cPickle.HIGHEST_PROTOCOL)
 			fo.close()
 			
-		elif (types == "test" ):	
-		#	try :
-		#		fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
-		#	except IOError :
-		#		print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
-		#		return
-		#	try :
-		#		meanx=cPickle.load(fl)
-		#		meany=cPickle.load(fl)
-		#		meanz=cPickle.load(fl)
-		#		stdx=cPickle.load(fl)
-		#		stdy=cPickle.load(fl)
-		#		stdz=cPickle.load(fl)
-		#	except :
-		#		fl.close()
-		#	fl.close()
+		elif (types == "test" ):
+			"""
+			try :
+				fl=open("/home/pi/libkindrv/PythonFile/Properties_file/Mean_and_Std","rb")
+			except IOError :
+				print tools.bcolors.FAIL + "In Sphere - unable to open Mean and Std file" + tools.bcolors.ENDC
+				return
+			try :
+				meanx=cPickle.load(fl)
+				meany=cPickle.load(fl)
+				meanz=cPickle.load(fl)
+				stdx=cPickle.load(fl)
+				stdy=cPickle.load(fl)
+				stdz=cPickle.load(fl)
+			except :
+				fl.close()
+			fl.close()
+			"""
 			meanx=np.mean(x)
 			meany=np.mean(y)
 			meanz=np.mean(z) 
 			stdx=np.std(x)
 			stdy=np.std(y)
 			stdz=np.std(z)
-		
+			
 		# 0 mean and one std
 				## allocation of memory
 		new_x=np.zeros(self.__DataLength*self.__prof*13)
@@ -117,7 +119,22 @@ class Sphere_calibration(object):
 			for j in range(0,self.__DataLength*self.__prof*13):
 				if math.isnan(SphereData[j,i])==True :
 					SphereData[j,i]=0
-			
+		if types == "test":
+				"""
+				try :
+						fl=open("/home/pi/libkindrv/PythonFile/Properties_file/PatientCalibration","rb")
+				except IOError :
+						print tools.bcolors.FAIL + "In Sphere - unable to open Patient Calibration" + tools.bcolors.ENDC
+						return
+				try :
+						Theta=cPickle.load(fl)
+						Phi=cPickle.load(fl)
+				except :
+						fl.close()
+				fl.close()
+				"""
+				Rotation=self.Angle2RotationMatrix(3.000,-5.00)
+				SphereData=SphereData.dot(Rotation)
 		feat_struct=np.concatenate((SphereData[:,0].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,1].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,2].reshape(13,self.__prof*self.__DataLength,order='F')),axis=0)
 
 				## allocation of memory
@@ -129,6 +146,45 @@ class Sphere_calibration(object):
 					
 					
 		return features
+		
+	def Angle2RotationMatrix(self,Theta,Phi):
+			
+				#define new vector director
+				u=np.zeros((3),'f')
+				u[0]=-math.sin(math.radians(Theta))
+				u[1]=math.cos(math.radians(Theta))
+				
+				# some angles
+				cosPhi=math.cos(math.radians(Phi))
+				sinPhi=math.sin(math.radians(Phi))
+				
+				# Phi Rotation
+				RotationPhi=np.zeros((3,3),'f')
+				RotationPhi[0,0]=(u[0]**2)*(1-cosPhi)+cosPhi#u[0]**2+(1-u[0]**2)*cosPhi
+				RotationPhi[0,1]=u[0]*u[1]*(1-cosPhi)
+				RotationPhi[0,2]=-u[1]*sinPhi
+				RotationPhi[1,0]=u[0]*u[1]*(1-cosPhi)
+				RotationPhi[1,1]=(u[1]**2)*(1-cosPhi)+cosPhi
+				RotationPhi[1,2]=u[0]*sinPhi
+				RotationPhi[2,0]=u[1]*sinPhi
+				RotationPhi[2,1]=-u[0]*sinPhi
+				RotationPhi[2,2]=cosPhi
+				np.savetxt('matr.out',RotationPhi)
+				# Theta Rotation
+				RotationTheta=np.zeros((3,3),'f')
+				RotationTheta[0,0]=u[1]
+				RotationTheta[0,1]=-u[0]
+				RotationTheta[0,2]=0
+				RotationTheta[1,0]=-u[0]
+				RotationTheta[1,1]=u[1]
+				RotationTheta[1,2]=0
+				RotationTheta[2,0]=0
+				RotationTheta[2,1]=0
+				RotationTheta[2,2]=1
+				
+				RotationMatrix=RotationTheta.dot(RotationPhi)
+				np.savetxt('mat.out',RotationMatrix)
+				return RotationMatrix
 
 if __name__ == "__main__" :
 	Sphere= Sphere_calibration()

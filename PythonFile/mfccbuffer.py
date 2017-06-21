@@ -11,6 +11,8 @@ import function
 import RingBuffer
 from scipy.signal import hilbert
 import Limiter
+from threading import Semaphore , Lock
+
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-04-27"
@@ -35,6 +37,7 @@ class MFFCsRingBuffer(object):
             self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
             self.__previous_amplitude_envelope=0.
             self.__Env=Env=Limiter._Limiter()
+            self.__Lock=Lock()
                 
         def extend(self,data):
 				data_index=(self.__index+np.arange(data.size))
@@ -56,12 +59,13 @@ class MFFCsRingBuffer(object):
                     print("Error : RingBuffer is overwritten ")
         
         def get(self):
-					print self.__tail
-					if self.__tail >= self.__lengthMax:
-						self.__tail=self.__lengthMax
-					idx=(0+np.arange(self.__tail))
-					temp=np.array(self.__data[idx])
-					MFCCs=temp.reshape((len(idx)/13),13).T
+					with self.__Lock:
+							print self.__tail
+							if self.__tail >= self.__lengthMax:
+									self.__tail=self.__lengthMax
+							idx=(0+np.arange(self.__tail))
+							temp=np.array(self.__data[idx])
+							MFCCs=temp.reshape((len(idx)/13),13).T
 					delta=function.deltaMFCCs(MFCCs,9)
 					deltaDelta=function.deltaMFCCs(delta,9)
 					mfccs=np.concatenate((MFCCs,delta,deltaDelta),axis=0)
@@ -128,8 +132,10 @@ class MFFCsRingBuffer(object):
 									self.__flag="rejeted"
 									print "rejected"
 									self.__data=np.zeros(2600)
+									self.__index=0
 							else :
 									self.__flag="admit"
+									print "tail was :", self.__tail
 
 					return self.__flag
 
