@@ -311,10 +311,7 @@ def ReadFeatureClass():
 				print filename , "folder"
 				listoffile=os.listdir(".")
 				for allfile in listoffile :
-						data=(np.loadtxt(allfile)).reshape(4680,1)#.T #os.listdir(".")[0]
-					#classFistLevel=np.matlib.repmat(FistSVMClass(filename),1,data.shape[1])
-					#classFistLevel=FirstSVMClass(filename)
-					#classNormal=np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])s
+						data=(np.loadtxt(allfile)).reshape(4680,1)
 						Features=np.hstack([Features,data])
 				classFirstLevel=np.matlib.repmat(FirstSVMClass(filename),1,len(listoffile))
 				classNormal=np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])
@@ -326,38 +323,14 @@ def ReadFeatureClass():
 				if (FirstSVMClass(filename)==2):
 							classRight=np.matlib.repmat(FolderClassDictionnary(filename),1,len(listoffile))
 							ClassRight=np.hstack([ClassRight,classRight])
-			#	if (FirstSVMClass(filename)==3):
-			#				classCenter=np.matlib.repmat(FolderClassDictionnary(filename),1,len(listoffile))
-			#				ClassCenter=np.hstack([ClassCenter,classCenter])
 				
 				os.chdir('../')
-			"""	
-			if FolderClassDictionnary(filename)>0 and (FolderClassDictionnary(filename)==9 or FolderClassDictionnary(filename)==10 or FolderClassDictionnary(filename)==11):
-				os.chdir(filename)
-				listoffile=os.listdir(".")
-				for allfile in listoffile :
-						data=(np.loadtxt(allfile)).reshape(4680,1) #classNormal=np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])s
-						FeaturesCenter=np.hstack([FeaturesCenter,data[(0+np.arange(3900))]])
-				classCenter=np.matlib.repmat(FolderClassDictionnary(filename),1,len(listoffile))
-				ClassCenter=np.hstack([ClassCenter,classCenter])
-				os.chdir('../')
-			"""
 		Features=Normalization.ClassAndFeaturesSplit(Features,"train")
-		#print FeaturesCenter.shape
-		#FeaturesCenter=Normalization.ClassAndFeaturesSplit(FeaturesCenter,"train")
 		for i in range (ClassFirstLevel.size):
 				if (ClassFirstLevel[0][i]==1):
-							#classLeft=np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])	
-							#ClassLeft=np.hstack([ClassLeft,classLeft])
 						FeaturesLeft=np.hstack([FeaturesLeft,Features[:,i].reshape(4680,1)])#data
 				if (ClassFirstLevel[0][i]==2):
-							#classRight=FolderClassDictionnary(filename)#np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])
-							#ClassRight=np.hstack([ClassRight,classRight])
-						FeaturesRight=np.hstack([FeaturesRight,Features[(0+np.arange(3900)),i].reshape(3900,1)])#data[(0+np.arange(3900))]]
-				#if (ClassFirstLevel[0][i]==3):
-							#classLeft=np.matlib.repmat(FolderClassDictionnary(filename),1,data.shape[1])	
-							#ClassLeft=np.hstack([ClassLeft,classLeft])
-				#		FeaturesCenter=np.hstack([FeaturesCenter,Features[(0+np.arange(3900)),i].reshape(3900,1)])#data
+						FeaturesRight=np.hstack([FeaturesRight,Features[(0+np.arange(3900)),i].reshape(3900,1)])
 			
 		
 		print tools.bcolors.OKGREEN + "In AudioIO - ReadFeatureClass : all features have been read." +tools.bcolors.ENDC
@@ -394,9 +367,6 @@ def test():
     ThirdSvmModel=MachineLearning.TrainSVM_RBF_Features(featuresR.T, classR)
     SaveClassifier("RightSVM",ThirdSvmModel)
     print tools.bcolors.HEADER + "Third SVM saved" + tools.bcolors.ENDC
-    #FourthSvmModel=MachineLearning.TrainSVM_RBF_Features(featuresC.T, classC)
-    #SaveClassifier("NumberSVM",FourthSvmModel)
-    #print tools.bcolors.HEADER + "Fourth SVM saved" + tools.bcolors.ENDC
     print tools.bcolors.OKGREEN + "All classifiers have been saved" +tools.bcolors.ENDC
     
 def train():
@@ -407,7 +377,6 @@ def train():
 		model=LoadClassifier("SVM")
 		modelL=LoadClassifier("LeftSVM")
 		modelR=LoadClassifier("RightSVM")
-		#modelC=LoadClassifier("NumberSVM")
 		params=dict(gamma=model.best_params_["gamma"], C=model.best_params_["C"])
 		
 		SVM=MachineLearning.TrainBestParams(params,features.T,ClassFistLevel)#ClassFistLevel
@@ -421,10 +390,6 @@ def train():
 		
 		SVMR=MachineLearning.TrainBestParams(paramsR,featuresR.T,classR)
 		print tools.bcolors.HEADER + "Right SVM Trained" + tools.bcolors.ENDC
-		#paramsC=dict(gamma=modelC.best_params_["gamma"], C=modelR.best_params_["C"])
-		
-		#SVMC=MachineLearning.TrainBestParams(paramsC,featuresC.T,classC)
-		#print tools.bcolors.HEADER + "Center SVM Trained" + tools.bcolors.ENDC
 		
 		print tools.bcolors.OKGREEN + "All SVM Trained correctly -> next step save them" + tools.bcolors.ENDC
 		SaveClassifier("SVM_Trained",SVM)
@@ -436,44 +401,13 @@ def train():
 		SaveClassifier("NumberSVM_Trained",SVMC)
 		print tools.bcolors.HEADER + "Center SVM Trained saved" + tools.bcolors.ENDC
 		print tools.bcolors.OKGREEN + "All SVM Trained have been saved" + tools.bcolors.ENDC
- 
- 
-def correl ():
-	Normalization=Sphere.Sphere_calibration()
-	listdirectory = os.listdir(".")
-	data=Normalization.ClassAndFeaturesSplit(np.loadtxt("coeff.out"),"test")
-	for filename in listdirectory:
-			if(FolderClassDictionnary(filename)==7):
-				os.chdir(filename)
-				data_TEST=Normalization.ClassAndFeaturesSplit((np.loadtxt(os.listdir(".")[0])).T,"train")
-				os.chdir('../')
-				mn=np.array([])#.reshape(5850,0)
-				m=np.zeros((5850,data_TEST.shape[1]))
-				for j in range(0,data_TEST.shape[1]):
-					
-					for i in range(0, data.size):
-						m[i,j]=(data[i]-data_TEST[i,j]).T
-				print m.shape ,"\n mean:", np.mean(m,axis=1), "\n std :" , np.std(m,axis=1)
-				np.savetxt('Param.out',(np.mean(m,axis=1), np.std(m, axis=1)))
-				#print "Class :" ,FolderClassDictionnary(filename) ,"\n", "moy : ", mn 
-				
-					#print(pearsonr(data,data_TEST[:,j]))
-					#time.sleep(2)
+
             
             
 if __name__=='__main__' :
    #FindWavFileAndStoreData()
 
- #correl()
 	test()
 	train()
-   #model=LoadClassifier("SVM_Trained")
-   #modelL=0 #LoadClassifier("LeftSVM_Trained")
-  #modelR=0 #LoadClassifier("RightSVM_Trained")
- # print(model)
- #  features=np.loadtxt('coeff.out')
- # print len(features)
-#   R1 , R2 , P1 , P2=MachineLearning.ClassifierWrapper(model, modelL, modelR,features)
- #  print R1, R2
 
    
