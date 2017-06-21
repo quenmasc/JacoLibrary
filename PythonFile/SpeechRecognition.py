@@ -218,7 +218,7 @@ class Speech_Recognition(object):
 			global MfccsCoeff
 			global Data
 			print tools.bcolors.OKBLUE +"Ready for Training "+ tools.bcolors.ENDC
-			while True :
+			while True  :
 						#self.__event.set()
 						self.__semaphore.acquire()
 						#self.__event.clear()
@@ -243,10 +243,6 @@ class Speech_Recognition(object):
 						else :
 							pass
 						self.__semaphoreLock.release()
-						#fil=wave.open('test.wav','wb')
-						#fil.setparams((1,2,8000,len(Audio),"NONE", "not compressed"))
-						#fil.writeframes(self.depseudonymize(DSP.denormalize(Audio,32768.0)))
-						#fil.close()
     
 if __name__=='__main__' :
     print "Running ...."
