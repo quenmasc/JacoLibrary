@@ -40,7 +40,6 @@ def ReadAudioFile(path):
 
 def FindWavFileAndStoreData():
     i=0
-
     os.chdir('mat/') #speech
     listdirectory = os.listdir(".")
     for filename in listdirectory :

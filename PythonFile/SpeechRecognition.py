@@ -23,6 +23,7 @@ import wave
 import struct
 from audioop import ratecv
 import ReadWriteRingBuffer
+import YinPitch
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-05-11"
@@ -118,6 +119,7 @@ class Speech_Recognition(object):
 			entropy = spectral_entropy.SPECTRAL_ENTROPY()
 			buff=mfccbuffer.MFFCsRingBuffer()
 			SpectralSub=SpectralSubstraction.Spectral_Substraction()
+			Yin=YinPitch.Yin_Pitch(0.05)
 			j=0
 			fl="out"
 			count=0
@@ -153,15 +155,16 @@ class Speech_Recognition(object):
 					c=np.zeros(200)
 					c=np.array(self.__ReadWrite.Treatment())
 					if np.all(c!=np.zeros(len(c))):
-							
+							#if j>=100 :
+								#c=SpectralSub.Substraction(c)
 							coeff,energy=mfcc.MFCC(np.array((c)))
 							SEntropy=entropy.SpectralEntropy(np.array((c)))
 							
 							if j<100 :
-								#Noise=SpectralSub.STFT(c[i])
+								#Noise=SpectralSub.STFT(c)
 								mfccNoise+=np.array(coeff)
 								entropyData.append(SEntropy)
-								#BackgroundNoise.append(Noise)
+							#	BackgroundNoise.append(Noise)
 								j+=1
 								if j==100 :
 									mfccNoise=mfccNoise/100
@@ -177,7 +180,7 @@ class Speech_Recognition(object):
 										n.append(entropyData[79+i])
 									entropyData=deque([])
 									entropyData=n
-									#SpectralSub.StoreParameter(BackgroundNoise)
+								#	SpectralSub.StoreParameter(BackgroundNoise)
 							else :
 								
 							# return MFCC and Spectral Entropy background noise
@@ -201,7 +204,7 @@ class Speech_Recognition(object):
 								if fl=="admit" :
 										self.__semaphoreLock.acquire()
 										with self.__lock :
-											MfccsCoeff=buff.get()
+											MfccsCoeff=buff.Reader()
 										self.__semaphore.release()
 						     
     
