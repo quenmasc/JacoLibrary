@@ -185,6 +185,72 @@ class Sphere_calibration(object):
 				RotationMatrix=RotationTheta.dot(RotationPhi)
 				np.savetxt('mat.out',RotationMatrix)
 				return RotationMatrix
+	
+	def SphereAxis(self, features):
+		self.__DataLength=int(features.size/features.shape[0])
+		self.__prof=int((features.size/39))
+		
+		self.__feature=np.zeros((39,self.__DataLength*self.__prof))
+		self.__feature=np.reshape(features,(39,self.__prof), order='F')
+		
+		# reshape all matrix in 3 vector -> MFCC, VMFCC, VVMFCC
+		x=self.__feature[(0+np.arange(13)),:].reshape(self.__feature[(0+np.arange(13)),:].size, order='F')
+		y=self.__feature[(13+np.arange(13)),:].reshape(self.__feature[(13+np.arange(13)),:].size, order='F')
+		z=self.__feature[(26+np.arange(13)),:].reshape(self.__feature[(26+np.arange(13)),:].size, order='F')
+		
+		meanx=np.mean(x)
+		meany=np.mean(y)
+		meanz=np.mean(z) 
+		stdx=np.std(x)
+		stdy=np.std(y)
+		stdz=np.std(z)
+			
+		# 0 mean and one std
+				## allocation of memory
+		new_x=np.zeros(self.__DataLength*self.__prof*13)
+		new_y=np.zeros(self.__DataLength*self.__prof*13)
+		new_z=np.zeros(self.__DataLength*self.__prof*13)
+		P_abs=np.zeros(self.__DataLength*self.__prof*13)
+		Q=np.zeros(x.size)
+				## operation
+		for i in range(0,x.size):
+			if x[i] != 0:
+				new_x[i]=((x[i]-meanx)/stdx)-self.__center[0]
+				new_y[i]=((y[i]-meany)/stdy)-self.__center[1]
+				new_z[i]=((z[i]-meanz)/stdz)-self.__center[2]
+				P_abs[i]=math.sqrt(new_x[i] **2 +new_y[i]**2 + new_z[i]**2)
+				Q[i]=(self.__rayon/P_abs[i]).T
+			else :
+				new_x[i]=0
+				new_y[i]=0
+				new_z[i]=0
+				P_abs[i]=0
+				Q[i]=0
+				
+		# Paramter to create sphere with dataset
+		P=(np.vstack((new_x,new_y,new_z))).T
+		# Sphere data
+				## allocation of memory
+		SphereData=np.zeros((self.__DataLength*self.__prof*13,3))
+		for i in range(0,3):
+			SphereData[:,i]=Q*P[:,i]
+			for j in range(0,self.__DataLength*self.__prof*13):
+				if math.isnan(SphereData[j,i])==True :
+					SphereData[j,i]=0
+		return SphereData
+		
+	def Sphere2Vector(self,SphereData,Theta,Phi):
+		Rotation=self.Angle2RotationMatrix(Theta,Phi)
+		SphereData=SphereData.dot(Rotation)
+		feat_struct=np.concatenate((SphereData[:,0].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,1].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,2].reshape(13,self.__prof*self.__DataLength,order='F')),axis=0)
+
+				## allocation of memory
+		features=np.zeros((39*self.__prof,self.__DataLength))
+		for i in range (0,self.__DataLength):
+			intermediaire=feat_struct[:,(i*self.__prof+np.arange(self.__prof))]
+			features[:,i]=intermediaire.reshape(intermediaire.size, order='F')
+		print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ..." + tools.bcolors.ENDC			
+		return features
 
 if __name__ == "__main__" :
 	Sphere= Sphere_calibration()
