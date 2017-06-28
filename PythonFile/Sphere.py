@@ -133,7 +133,7 @@ class Sphere_calibration(object):
 						fl.close()
 				fl.close()
 				"""
-				Rotation=self.Angle2RotationMatrix(3.000,-5.00)
+				Rotation=self.Angle2RotationMatrix(-18.4143,-12.8245)
 				SphereData=SphereData.dot(Rotation)
 		feat_struct=np.concatenate((SphereData[:,0].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,1].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,2].reshape(13,self.__prof*self.__DataLength,order='F')),axis=0)
 
