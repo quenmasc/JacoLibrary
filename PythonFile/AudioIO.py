@@ -350,6 +350,15 @@ def LoadClassifier(SVMModelName):
         print tools.bcolors.FAIL +"Unable to load the Classifier %s"%SVMModelName+tools.bcolors.ENDC
         return
 
+
+def LoadParams(SVMModelName):
+    try : 
+        model=np.loadtxt("/home/pi/libkindrv/PythonFile/Properties_file/%s"%SVMModelName)
+        print tools.bcolors.OKGREEN + "Classifier loaded %s"%SVMModelName + tools.bcolors.ENDC
+        return model[1+np.arange(len(model)-1)]
+    except IOError :
+        print tools.bcolors.FAIL +"Unable to load the Classifier %s"%SVMModelName+tools.bcolors.ENDC
+        return
     
 def test():
     [features, featuresL, featuresR, featuresC, classL, classR, classC,ClassFistLevel, CN]=ReadFeatureClass()

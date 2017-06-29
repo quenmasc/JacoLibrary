@@ -94,9 +94,8 @@ class Speech_Recognition(object):
 				else :
 					raise
 			print tools.bcolors.OKGREEN + "In SVM Method - All done" + tools.bcolors.ENDC
-			ChangeSVM= False 
-			Theta=np.array([-12.02,15.05,-5.80,160.05])
-			Phi=np.array([20.13,5.05,55.80,48.05])
+			Theta=AudioIO.LoadParams('score_T.out')
+			Phi=AudioIO.LoadParams('score_P.out')
 			queue_class=Queue(len(Theta))
 			while True :
 					self.__semaphore.acquire()
@@ -190,7 +189,7 @@ class Speech_Recognition(object):
 									entropyData=deque([]) 
 									for k in range(0,len(Data)) :
 										entropyData.append(function.distance(Data[k],entropyNoise))
-									entropyThreshNoise =function.MeanStandardDeviation(entropyData,3)
+									entropyThreshNoise =function.MeanStandardDeviation(entropyData,2)
 									print tools.bcolors.OKBLUE + "Recording is now allowed" +tools.bcolors.ENDC
 									n=deque([])
 									for i in range(0,20):
