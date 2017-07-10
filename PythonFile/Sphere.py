@@ -186,7 +186,7 @@ class Sphere_calibration(object):
 				np.savetxt('mat.out',RotationMatrix)
 				return RotationMatrix
 	
-	def SphereAxis(self, features):
+	def SphereAxis(self, features,Center):
 		self.__DataLength=int(features.size/features.shape[0])
 		self.__prof=int((features.size/39))
 		
@@ -215,9 +215,9 @@ class Sphere_calibration(object):
 				## operation
 		for i in range(0,x.size):
 			if x[i] != 0:
-				new_x[i]=((x[i]-meanx)/stdx)-self.__center[0]
-				new_y[i]=((y[i]-meany)/stdy)-self.__center[1]
-				new_z[i]=((z[i]-meanz)/stdz)-self.__center[2]
+				new_x[i]=((x[i]-meanx)/stdx)-Center[0]
+				new_y[i]=((y[i]-meany)/stdy)-Center[1]
+				new_z[i]=((z[i]-meanz)/stdz)-Center[2]
 				P_abs[i]=math.sqrt(new_x[i] **2 +new_y[i]**2 + new_z[i]**2)
 				Q[i]=(self.__rayon/P_abs[i]).T
 			else :
@@ -239,7 +239,8 @@ class Sphere_calibration(object):
 					SphereData[j,i]=0
 		return SphereData
 		
-	def Sphere2Vector(self,SphereData,Theta,Phi):
+	def Sphere2Vector(self,features,Center,Theta,Phi):
+		SphereData=self.SphereAxis(features, Center)
 		Rotation=self.Angle2RotationMatrix(Theta,Phi)
 		SphereData=SphereData.dot(Rotation)
 		feat_struct=np.concatenate((SphereData[:,0].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,1].reshape(13,self.__prof*self.__DataLength,order='F'),SphereData[:,2].reshape(13,self.__prof*self.__DataLength,order='F')),axis=0)

@@ -96,22 +96,24 @@ class Speech_Recognition(object):
 			print tools.bcolors.OKGREEN + "In SVM Method - All done" + tools.bcolors.ENDC
 			Theta=AudioIO.LoadParams('score_T.out')
 			Phi=AudioIO.LoadParams('score_P.out')
-			queue_class=Queue(len(Theta))
+			Center=AudioIO.LoadParams('center.out')
+			queue_class=Queue(len(Theta)-11)
 			while True :
 					self.__semaphore.acquire()
 					with self.__lock :
 							MfccsCoeffGet=MfccsCoeff 
 					self.__semaphoreLock.release()
-					newcoeff=(self.__CoeffSphere.SphereAxis(MfccsCoeffGet))
+					#newcoeff=(self.__CoeffSphere.SphereAxis(MfccsCoeffGet))
 					threads=[]
-					for i in range(len(Theta)):
-						th=threading.Thread(target=self.SphereRotationPrediction,args=(Theta[i],Phi[i],newcoeff,svm,svmL,svmR,queue_class,))
+					for i in range(11,len(Theta)):
+						th=threading.Thread(target=self.SphereRotationPrediction,args=(Center[i],Theta[i],Phi[i],MfccsCoeffGet,svm,svmL,svmR,queue_class,))
 						th.start()
 						threads.append(th)
 					for i in threads :
 						i.join()
-					print [queue_class.get() for _ in xrange(len(Theta))]
-					#print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
+					#print [queue_class.get() for _ in xrange(len(Theta)-11)]
+					classL=[queue_class.get() for _ in xrange(len(Theta)-11)][0]
+					print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
 					#if classL != 8 :
 					#		self.write_Pipe(classL)
 					#print "Done ..."
@@ -122,8 +124,8 @@ class Speech_Recognition(object):
 				f.write(bin(classL)[2:])
 				f.flush()
                    
-		def SphereRotationPrediction(self,Theta,Phi,SphereData,svm,svmL,svmR,queue):
-				newcoeff=self.__CoeffSphere.Sphere2Vector(SphereData,Theta,Phi).T
+		def SphereRotationPrediction(self,Center,Theta,Phi,SphereData,svm,svmL,svmR,queue):
+				newcoeff=self.__CoeffSphere.Sphere2Vector(SphereData,Center,Theta,Phi).T
 				classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
 				queue.put(classL)
 			
