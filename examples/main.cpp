@@ -12,11 +12,13 @@
 #include <string>
 #include <cstdlib>
 
-#define GREEN "\x1b[36m"
+#define GREEN "\x1b[32m"
+#define BLUE "\x1b[34m"
 #define RESET "\x1b[0m"
 
 using namespace KinDrv;
 PythonBridge Bridge ;
+
 int flag_Mode =false ;
 bool flag_Goto = false ;
 int last_Mode_Call =16;
@@ -44,11 +46,8 @@ goto_retract(JacoArm *arm)
     case MODE_READY_STANDBY:
     case MODE_RETRACT_TO_READY:
       // just 1 button press needed
-	while(1){
       arm->push_joystick_button(2);
       break;
-	while(1){
-
     case MODE_NORMAL_TO_READY:
     case MODE_NORMAL:
     case MODE_NOINIT:
@@ -73,8 +72,10 @@ goto_retract(JacoArm *arm)
   }
   arm->release_joystick();
 
+
   return 1;
 }
+
 
 
 int
@@ -91,6 +92,7 @@ goto_home(JacoArm *arm)
       arm->release_joystick();
       arm->push_joystick_button(2);
       break;
+
 
     case MODE_NORMAL_TO_READY:
     case MODE_READY_TO_RETRACT:
@@ -257,7 +259,8 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 													break ;
 												}
 										break ;
-								case 15 :
+						
+		case 15 :
 										last_Mode_Call=14;
 										OpenClose=1;
 										flag_Mode=false;
@@ -439,27 +442,62 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 	n=std::stoi(data,nullptr,2);
 	my_queue.push(n);
 	
-	
+	switch (n){
+		case 1 : 
+			word="BACKWARD";
+			break;
+		case 2 :
+			word="FORWARD";
+			break;
+		case 3 :
+			word="LEFT";
+			break;
+		case 4 :
+			word= "RIGHT";
+			break;
+		case 6 :
+			word= "READY";
+			break;
+		case 12 :
+			word= "UP";
+			break;
+		case 13 :
+			word= "DOWN";
+			break;
+		case 14 :
+			word= "OPEN";
+			mode="GRIPPER";
+			break;
+		case 15 :
+			word= "CLOSE";
+			mode="GRIPPER";
+			break;
+		case 18 :
+			word= "STOP";
+			break;
+		case 16 :
+			mode="TRANSLATION";
+			break;
+		case 17 :
+			mode= "ROTATION";
+			break;
+		default :
+			break;
+	}
 	std::system("clear");
-	printf(GREEN" ____     ___  ____  _____    _____  _____  _____  ____  ____  _____ _  " RESET "\n");
-	printf(GREEN "|_   |   /   ||  __||  _  |  |  _  ||  _  \|  _  ||_   ||  _ ||  __|| |_" RESET "\n");
-	printf(GREEN"  |  |  / _  || |   | | | |  | |_| || |_| || | | |  |  || |_  | |   |  _|" RESET "\n");
-	printf(GREEN"  |  | / |_| || |   | | | |  |  ___||  _  /| | | |  |  ||  _| | |   | | " RESET "\n");
-	printf(GREEN" _/  |/  / | || |__ | |_| |  | |    | | \ \| |_| | _/  || |__ | |__ | \__" RESET "\n");
-	printf(GREEN"|___/|__/  |_||____||_____|  |_|    |_|  \_\_____||___/ |____||____| \___|" RESET "\n");
+	printf(GREEN"****************************************************************************" RESET "\n");
+	printf(GREEN"*  ____    ___  ____  _____    _____  _____   _____  ____  ____  _____ _    *" RESET "\n");
+	printf(GREEN"* |_   |  /   ||  __||  _  |  |  _  ||  _  | |  _  ||_   ||  __||  __|| |_  *" RESET "\n");
+	printf(GREEN"*  |  |  / _  || |   | | | |  | |_| || |_| | | | | |  |  || |_  | |   |  _| *" RESET "\n");
+	printf(GREEN"*  |  | / |_| || |   | | | |  |  ___||  _  / | | | |  |  ||  _| | |   | |   *" RESET "\n");
+	printf(GREEN"* _/  |/  / | || |__ | |_| |  | |    | | | | | |_| | _/  || |__ | |__ | |__ *" RESET "\n");
+	printf(GREEN"*|___/|__/  |_||____||_____|  |_|    |_|  |_||_____||___/ |____||____||____|*" RESET "\n");
+	printf(GREEN"*                                                                          *" RESET "\n");
+	printf(GREEN"*        SPEECH RECOGNITION MODULE   - Developed by Q.MASCRET              *" RESET "\n");
+	printf(GREEN"****************************************************************************" RESET "\n");
 	printf("\n");
-	printf("\n");
-	printf(GREEN"**************************************************************************" RESET "\n");
-	printf(GREEN"                       SPEECH RECOGNITION MODULE                          " RESET "\n");
-	printf(GREEN"**************************************************************************" RESET "\n");
-	printf("\n");
-	printf("\n");
-	printf(GREEN"**************************************************************************" RESET "\n");
-	printf(GREEN"       System Informations         *****                                  " RESET "\n");
-	printf(GREEN"**************************************************************************" RESET "\n");
-	printf("\n");
-	std::cout << "Current mode is " << mode <<"\n"<< std::endl;
-	std::cout << "Current movement is " << word << "\n"<< std::endl;
+	std::cout << "Mode :" << mode <<"\n"<< std::endl;
+	std::cout << "Movement :" << word <<"\n"<< std::endl;
 	
 }
 }
