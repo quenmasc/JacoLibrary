@@ -10,6 +10,10 @@
 #include <libkindrv/kindrv.h>
 #include <queue>
 #include <string>
+#include <cstdlib>
+
+#define GREEN "\x1b[36m"
+#define RESET "\x1b[0m"
 
 using namespace KinDrv;
 PythonBridge Bridge ;
@@ -40,8 +44,10 @@ goto_retract(JacoArm *arm)
     case MODE_READY_STANDBY:
     case MODE_RETRACT_TO_READY:
       // just 1 button press needed
+	while(1){
       arm->push_joystick_button(2);
       break;
+	while(1){
 
     case MODE_NORMAL_TO_READY:
     case MODE_NORMAL:
@@ -151,7 +157,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 										usleep(50000);
 										last_Mode_Call=16;
 										flag_Mode=false;
-										printf("Mode one selected\n");
+										//printf("Mode one selected\n");
 										break ;
 								default :
 										if (before_Mode_3_call==16){
@@ -163,7 +169,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 												usleep(50000);
 												last_Mode_Call=16;
 												flag_Mode=false;
-												printf("Mode one selected\n");
+												//printf("Mode one selected\n");
 												break ;
 											}
 											else {
@@ -179,7 +185,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 												usleep(50000);
 												last_Mode_Call=16;
 												flag_Mode=false;
-												printf("Mode one selected\n");
+												//printf("Mode one selected\n");
 												break ;
 											}
 							}
@@ -200,7 +206,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 										usleep(50000);
 										last_Mode_Call=17;
 										flag_Mode=false;
-										printf("Mode two selected\n");
+										//printf("Mode two selected\n");
 										break ;
 								default : 
 										if (before_Mode_3_call==17){
@@ -212,7 +218,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 												usleep(50000);
 												last_Mode_Call=17;
 												flag_Mode=false;
-												printf("Mode two selected\n");
+												//printf("Mode two selected\n");
 												break ;
 											}
 											else {
@@ -228,7 +234,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 												usleep(50000);
 												last_Mode_Call=17;
 												flag_Mode=false;
-												printf("Mode two selected\n");
+												//printf("Mode two selected\n");
 												break ;
 											}
 							}
@@ -266,7 +272,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 										last_Mode_Call=14;
 										flag_Mode=false;
 										before_Mode_3_call=16;
-										printf("Mode three selected\n");
+										//printf("Mode three selected\n");
 										break ;
 										
 								case 17 :
@@ -279,7 +285,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 										last_Mode_Call=14;
 										flag_Mode=false;
 										before_Mode_3_call=17;
-										printf("Mode three selected\n");
+										//printf("Mode three selected\n");
 										break ;
 										
 							}
@@ -318,7 +324,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 										last_Mode_Call=15;
 										flag_Mode=false;
 										before_Mode_3_call=16;
-										printf("Mode three selected 16 \n");
+										//printf("Mode three selected 16 \n");
 										break ;
 										
 								case 17 :
@@ -331,7 +337,7 @@ void ModeCHange(JacoArm *arm,jaco_joystick_axis_t axes, int OldClass, int n){
 										last_Mode_Call=15;
 										flag_Mode=false;
 										before_Mode_3_call=17;
-										printf("Mode three selected 17\n");
+										//printf("Mode three selected 17\n");
 										break ;
 										
 							}
@@ -406,7 +412,13 @@ void PythonRoutine(){
 
 void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue ){
 	sleep(2);
+	std::string mode;
+	
 	std::string keyboard;
+	std::string word ;
+	keyboard="TRANSLATION";
+	word="READY";
+	
 	const char *fifo_name="/home/pi/libkindrv/examples/build/fifo";
 	std::cout << "Pipe is opened" << std::endl;
 	int n;
@@ -425,11 +437,30 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 		data.assign(buf.data(),buf.size());
 	}
 	n=std::stoi(data,nullptr,2);
-	printf("Current class is %i , Are you agree with ? [Y] or N\n",n);
-	//std::cin >> keyboard;
-	//if ((keyboard=="y" )| (keyboard=="Y")){
-		my_queue.push(n);
-	//}
+	my_queue.push(n);
+	
+	
+	std::system("clear");
+	printf(GREEN" ____     ___  ____  _____    _____  _____  _____  ____  ____  _____ _  " RESET "\n");
+	printf(GREEN "|_   |   /   ||  __||  _  |  |  _  ||  _  \|  _  ||_   ||  _ ||  __|| |_" RESET "\n");
+	printf(GREEN"  |  |  / _  || |   | | | |  | |_| || |_| || | | |  |  || |_  | |   |  _|" RESET "\n");
+	printf(GREEN"  |  | / |_| || |   | | | |  |  ___||  _  /| | | |  |  ||  _| | |   | | " RESET "\n");
+	printf(GREEN" _/  |/  / | || |__ | |_| |  | |    | | \ \| |_| | _/  || |__ | |__ | \__" RESET "\n");
+	printf(GREEN"|___/|__/  |_||____||_____|  |_|    |_|  \_\_____||___/ |____||____| \___|" RESET "\n");
+	printf("\n");
+	printf("\n");
+	printf(GREEN"**************************************************************************" RESET "\n");
+	printf(GREEN"                       SPEECH RECOGNITION MODULE                          " RESET "\n");
+	printf(GREEN"**************************************************************************" RESET "\n");
+	printf("\n");
+	printf("\n");
+	printf(GREEN"**************************************************************************" RESET "\n");
+	printf(GREEN"       System Informations         *****                                  " RESET "\n");
+	printf(GREEN"**************************************************************************" RESET "\n");
+	printf("\n");
+	std::cout << "Current mode is " << mode <<"\n"<< std::endl;
+	std::cout << "Current movement is " << word << "\n"<< std::endl;
+	
 }
 }
 }
