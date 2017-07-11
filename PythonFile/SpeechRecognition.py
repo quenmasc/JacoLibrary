@@ -94,10 +94,10 @@ class Speech_Recognition(object):
 				else :
 					raise
 			print tools.bcolors.OKGREEN + "In SVM Method - All done" + tools.bcolors.ENDC
-			Theta=AudioIO.LoadParams('score_T.out')
-			Phi=AudioIO.LoadParams('score_P.out')
-			Center=AudioIO.LoadParams('center.out')
-			queue_class=Queue(len(Theta)-11)
+			Theta=0.0#AudioIO.LoadParams('score_T.out')
+			Phi=0.0#AudioIO.LoadParams('score_P.out')
+			Center=[0,0,0]#AudioIO.LoadParams('center.out')
+			queue_class=Queue(1)#Queue(len(Theta)-11)
 			while True :
 					self.__semaphore.acquire()
 					with self.__lock :
@@ -105,17 +105,17 @@ class Speech_Recognition(object):
 					self.__semaphoreLock.release()
 					#newcoeff=(self.__CoeffSphere.SphereAxis(MfccsCoeffGet))
 					threads=[]
-					for i in range(11,len(Theta)):
-						th=threading.Thread(target=self.SphereRotationPrediction,args=(Center[i],Theta[i],Phi[i],MfccsCoeffGet,svm,svmL,svmR,queue_class,))
+					for i in range(0,1):#range(11,len(Theta)):
+						th=threading.Thread(target=self.SphereRotationPrediction,args=(Center,Theta,Phi,MfccsCoeffGet,svm,svmL,svmR,queue_class,))
 						th.start()
 						threads.append(th)
 					for i in threads :
 						i.join()
 					#print [queue_class.get() for _ in xrange(len(Theta)-11)]
-					classL=[queue_class.get() for _ in xrange(len(Theta)-11)][0]
-					print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
-					#if classL != 8 :
-					#		self.write_Pipe(classL)
+					classL=[queue_class.get() for _ in xrange(1)][0]#len(Theta)-11
+					#print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
+					if classL != 8 :
+							self.write_Pipe(classL)
 					#print "Done ..."
 					    
 		def write_Pipe(self,classL):

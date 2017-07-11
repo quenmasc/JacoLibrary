@@ -79,7 +79,7 @@ class MFFCsRingBuffer(object):
 				return data			
         
 	def get(self):
-					print self.__tail
+					#print self.__tail
 					if self.__tail >= self.__lengthMax:
 							self.__tail=self.__lengthMax
 					idx=(0+np.arange(self.__tail))
@@ -149,12 +149,12 @@ class MFFCsRingBuffer(object):
 					if self.__flag=="done" :
 							if self.__tail< self.__lengthOfWindowMinima :
 									self.__flag="rejeted"
-									print "rejected"
+									#print "rejected"
 									self.__data=np.zeros(2600)
 									self.__head=0
 							else :
 									self.__flag="admit"
-									print "tail was :", self.__tail
+									#print "tail was :", self.__tail
 
 					return self.__flag
 
