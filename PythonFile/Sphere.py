@@ -80,7 +80,7 @@ class Sphere_calibration(object):
 			except :
 				fl.close()
 			fl.close()
-			"""
+			
 			meanx=np.mean(x)
 			meany=np.mean(y)
 			meanz=np.mean(z)
@@ -97,7 +97,13 @@ class Sphere_calibration(object):
 			stdx=math.sqrt(stdlx/incr)
 			stdy=math.sqrt(stdly/incr)
 			stdz=math.sqrt(stdlz/incr)
-			
+			"""
+			meanx=np.mean(x)
+			meany=np.mean(y)
+			meanz=np.mean(z) 
+			stdx=np.std(x)
+			stdy=np.std(y)
+			stdz=np.std(z)
 		# 0 mean and one std
 				## allocation of memory
 		new_x=np.zeros(self.__DataLength*self.__prof*13)
@@ -207,7 +213,7 @@ class Sphere_calibration(object):
 		x=self.__feature[(0+np.arange(13)),:].reshape(self.__feature[(0+np.arange(13)),:].size, order='F')
 		y=self.__feature[(13+np.arange(13)),:].reshape(self.__feature[(13+np.arange(13)),:].size, order='F')
 		z=self.__feature[(26+np.arange(13)),:].reshape(self.__feature[(26+np.arange(13)),:].size, order='F')
-		"""
+		
 		meanx=np.mean(x)
 		meany=np.mean(y)
 		meanz=np.mean(z) 
@@ -231,6 +237,7 @@ class Sphere_calibration(object):
 		stdx=math.sqrt(stdlx/incr)
 		stdy=math.sqrt(stdly/incr)
 		stdz=math.sqrt(stdlz/incr)	
+		"""
 		# 0 mean and one std
 				## allocation of memory
 		new_x=np.zeros(self.__DataLength*self.__prof*13)

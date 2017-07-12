@@ -14,6 +14,7 @@ import alsaaudio as alsa
 import struct
 import DSP
 import Limiter
+import tools
 
 __author__="Quentin MASCRET <quentin.mascret.1@ulaval.ca>"
 __date__="2017-06-07"
@@ -109,7 +110,7 @@ class RingBuffer(object):
 				inp.setrate(8000) # sample  rate
 				inp.setformat(alsa.PCM_FORMAT_S16_LE) # format of sample
 				inp.setperiodsize(8000 / 50) # buffer period size
-				print  "In alsa_record - Audio Device is correctly parameted" 
+				print tools.bcolors.OKGREEN+ "In alsa_record - Audio Device is correctly parameted" + tools.bcolors.ENDC
 				Compressor=Limiter._Limiter()
 				while True :
 						frame_count, data = inp.read()
