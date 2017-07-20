@@ -68,10 +68,10 @@ class Speech_Recognition(object):
 			self.__t3.start()
 			#self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
 			##self.__t1.start()
-			#self.__t4=threading.Thread(target=self.Train)
-			#self.__t4.start()
-			self.__t2=threading.Thread(target=self.SVM)
-			self.__t2.start()
+			self.__t4=threading.Thread(target=self.Train)
+			self.__t4.start()
+			#self.__t2=threading.Thread(target=self.SVM)
+			#self.__t2.start()
 			self.__ReadWrite.Recorder()
 		
 			
@@ -248,7 +248,7 @@ class Speech_Recognition(object):
 						x= int( raw_input("Class of the current word\n"))
 						print "Labelclass is :" ,x
 						if (x!=0):
-								struct='Calibration/Gabriel/%s'%AudioIO.TrainClasse(x)
+								struct='Calibration/Jean-Michel/%s'%AudioIO.TrainClasse(x)
 								if not os.path.exists(struct) :
 										os.makedirs(struct)
 										print tools.bcolors.OKBLUE +"folder :" ,struct, "has been created" + tools.bcolors.ENDC
