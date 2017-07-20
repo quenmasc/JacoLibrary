@@ -79,7 +79,7 @@ class MFFCsRingBuffer(object):
 				return data			
         
 	def get(self):
-					#print self.__tail
+					print self.__tail
 					if self.__tail >= self.__lengthMax:
 							self.__tail=self.__lengthMax
 					idx=(0+np.arange(self.__tail))
