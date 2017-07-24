@@ -11,14 +11,15 @@
 #include <queue>
 #include <string>
 #include <cstdlib>
+#include <iomanip>
 
+#define RED "\x1b[31m"
 #define GREEN "\x1b[32m"
 #define BLUE "\x1b[34m"
 #define RESET "\x1b[0m"
 
 using namespace KinDrv;
 PythonBridge Bridge ;
-
 int flag_Mode =false ;
 bool flag_Goto = false ;
 int last_Mode_Call =16;
@@ -104,12 +105,10 @@ goto_home(JacoArm *arm)
       break;
 
     case MODE_ERROR:
-      printf("some error?! \n");
       return 0;
       break;
 
     case MODE_READY_STANDBY:
-      printf("nothing to do here \n");
       return 1;
       break;
   }
@@ -416,11 +415,12 @@ void PythonRoutine(){
 void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue ){
 	sleep(2);
 	std::string mode;
-	
 	std::string keyboard;
 	std::string word ;
-	keyboard="TRANSLATION";
+	std::string status;
+	mode="TRANSLATION";
 	word="READY";
+	status="WAITING ORDER";
 	
 	const char *fifo_name="/home/pi/libkindrv/examples/build/fifo";
 	std::cout << "Pipe is opened" << std::endl;
@@ -445,24 +445,31 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 	switch (n){
 		case 1 : 
 			word="BACKWARD";
+			status="RUNNING";
 			break;
 		case 2 :
 			word="FORWARD";
+			status="RUNNING";
 			break;
 		case 3 :
 			word="LEFT";
+			status="RUNNING";
 			break;
 		case 4 :
 			word= "RIGHT";
+			status="RUNNING";
 			break;
 		case 6 :
 			word= "READY";
+			status="WAITING ORDER";
 			break;
 		case 12 :
 			word= "UP";
+			status="RUNNING";
 			break;
 		case 13 :
 			word= "DOWN";
+			status="RUNNING";
 			break;
 		case 14 :
 			word= "OPEN";
@@ -471,15 +478,19 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 		case 15 :
 			word= "CLOSE";
 			mode="GRIPPER";
+			status="RUNNING";
 			break;
 		case 18 :
 			word= "STOP";
+			status="WAITING ORDER";
 			break;
 		case 16 :
 			mode="TRANSLATION";
+			status="WAITING ORDER";
 			break;
 		case 17 :
 			mode= "ROTATION";
+			status="WAITING ORDER";
 			break;
 		default :
 			break;
@@ -492,13 +503,19 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 	printf(GREEN"*  |  | / |_| || |   | | | |  |  ___||  _  / | | | |  |  ||  _| | |   | |   *" RESET "\n");
 	printf(GREEN"* _/  |/  / | || |__ | |_| |  | |    | | | | | |_| | _/  || |__ | |__ | |__ *" RESET "\n");
 	printf(GREEN"*|___/|__/  |_||____||_____|  |_|    |_|  |_||_____||___/ |____||____||____|*" RESET "\n");
-	printf(GREEN"*                                                                          *" RESET "\n");
-	printf(GREEN"*        SPEECH RECOGNITION MODULE   - Developed by Q.MASCRET              *" RESET "\n");
-	printf(GREEN"****************************************************************************" RESET "\n");
+	printf(GREEN"*                                                                           *" RESET "\n");
+	printf(GREEN"*        SPEECH RECOGNITION MODULE   - Developed by Q.MASCRET               *" RESET "\n");
+	printf(GREEN"*****************************************************************************" RESET "\n");
 	printf("\n");
-	std::cout << "Mode :" << mode <<"\n"<< std::endl;
-	std::cout << "Movement :" << word <<"\n"<< std::endl;
-	
+	std::cout << std::left << std::setw(6) << std::setfill(' ') << GREEN "Current Mode ..is " RESET;
+	std::cout << std::left << std::setw(10) << std::setfill(' ') << mode ;
+	std::cout << std::endl;
+	std::cout << std::left << std::setw(6) << std::setfill(' ') << GREEN "Current Word ..is " RESET ;
+	std::cout << std::left << std::setw(10) << std::setfill(' ') << word ;
+	std::cout << std::endl;
+	std::cout << std::left << std::setw(6) << std::setfill(' ') << GREEN "Current Status is " RESET ;
+	std::cout << std::left << std::setw(10) << std::setfill(' ') << status ;
+	std::cout << std::endl;
 }
 }
 }
@@ -525,25 +542,35 @@ void Result (std::queue<int> &my_queue,JacoArm *arm,jaco_joystick_axis_t axes, j
 int main(){
 	// queues
 	std::queue<int> my_queue;
-
-  printf("Speech Recognition Module \n");
+	std::system("clear");
+	printf(GREEN"****************************************************************************" RESET "\n");
+	printf(GREEN"*  ____    ___  ____  _____    _____  _____   _____  ____  ____  _____ _    *" RESET "\n");
+	printf(GREEN"* |_   |  /   ||  __||  _  |  |  _  ||  _  | |  _  ||_   ||  __||  __|| |_  *" RESET "\n");
+	printf(GREEN"*  |  |  / _  || |   | | | |  | |_| || |_| | | | | |  |  || |_  | |   |  _| *" RESET "\n");
+	printf(GREEN"*  |  | / |_| || |   | | | |  |  ___||  _  / | | | |  |  ||  _| | |   | |   *" RESET "\n");
+	printf(GREEN"* _/  |/  / | || |__ | |_| |  | |    | | | | | |_| | _/  || |__ | |__ | |__ *" RESET "\n");
+	printf(GREEN"*|___/|__/  |_||____||_____|  |_|    |_|  |_||_____||___/ |____||____||____|*" RESET "\n");
+	printf(GREEN"*                                                                           *" RESET "\n");
+	printf(GREEN"*        SPEECH RECOGNITION MODULE   - Developed by Q.MASCRET               *" RESET "\n");
+	printf(GREEN"*****************************************************************************" RESET "\n");
+	printf("\n");
 
   // explicitly initialize jaco_joystick_axis_t axesa libusb context; optional
   KinDrv::init_usb();
 
 
 
-  printf("Create a JacoArm \n");
+  printf(BLUE "Create a JacoArm \n" RESET);
   JacoArm *arm;
   try {
     arm = new JacoArm();
-    printf("Successfully connected to arm! \n");
+    printf(GREEN "Successfully connected to arm! \n" RESET);
   } catch( KinDrvException &e ) {
-    printf("error %i: %s \n", e.error(), e.what());
+    printf(RED "error %i: %s \n" RESET, e.error(), e.what());
     return 0;
   }
 
-  printf("Gaining API control over the arm \n");
+  printf(BLUE "Gaining API control over the arm \n" RESET);
   arm->start_api_ctrl();
 
 
@@ -564,7 +591,6 @@ int main(){
 
     arm->release_joystick();
   }
-  printf("Arm is initialized now, state: %i \n", mode);
 
   // we want to start from home_position
   goto_home(arm);
@@ -573,8 +599,6 @@ int main(){
   // Angular-control is also possible, then you would control each joint!
   arm->set_control_cart();
   usleep(1e6);
-
-  printf("Sending joystick movements. We want the arm to: \n");
   // Check the documentation (or types.h) to see how to interprete the joystick-values.
   // Also make sure, that all the fields of a joystick-structs that should not have an effect are set to 0! So initialize all jaco_joystick_ structs with 0!
   jaco_joystick_axis_t axes = {0};
