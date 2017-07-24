@@ -94,38 +94,24 @@ class Speech_Recognition(object):
 				else :
 					raise
 			print tools.bcolors.OKGREEN + "In SVM Method - All done" + tools.bcolors.ENDC
-			Theta=AudioIO.LoadParams('score_T.out')
-			Phi=AudioIO.LoadParams('score_P.out')
-			queue_class=Queue(len(Theta))
+			Theta=0.0#AudioIO.LoadParams('score_T.out')
+			Phi=0.0#AudioIO.LoadParams('score_P.out')
+			Center=[0.0,0.0,0.0]#AudioIO.LoadParams('center.out')
 			while True :
 					self.__semaphore.acquire()
 					with self.__lock :
 							MfccsCoeffGet=MfccsCoeff 
 					self.__semaphoreLock.release()
-					newcoeff=(self.__CoeffSphere.SphereAxis(MfccsCoeffGet))
-					threads=[]
-					for i in range(len(Theta)):
-						th=threading.Thread(target=self.SphereRotationPrediction,args=(Theta[i],Phi[i],newcoeff,svm,svmL,svmR,queue_class,))
-						th.start()
-						threads.append(th)
-					for i in threads :
-						i.join()
-					print [queue_class.get() for _ in xrange(len(Theta))]
-					#print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
-					#if classL != 8 :
-					#		self.write_Pipe(classL)
-					#print "Done ..."
+					newcoeff=self.__CoeffSphere.Sphere2Vector(MfccsCoeffGet,Center,Theta,Phi).T
+					classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
+					if classL != 8 :
+							self.write_Pipe(classL)
 					    
 		def write_Pipe(self,classL):
 			with open('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name,'wb') as f:
 				f.write('{}\n'.format(len(bin(classL)[2:])).encode())
 				f.write(bin(classL)[2:])
 				f.flush()
-                   
-		def SphereRotationPrediction(self,Theta,Phi,SphereData,svm,svmL,svmR,queue):
-				newcoeff=self.__CoeffSphere.Sphere2Vector(SphereData,Theta,Phi).T
-				classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
-				queue.put(classL)
 			
 			
 		def VocalActivityDetection(self):
@@ -166,7 +152,6 @@ class Speech_Recognition(object):
 			endpoint=np.empty(2,'f')
 			corr=np.empty((2,1),'f')
 			flag=0
-			print tools.bcolors.OKGREEN + " Traitment is loaded " + tools.bcolors.ENDC
 			while True :
 					c=np.zeros(200)
 					c=np.array(self.__ReadWrite.Treatment())
@@ -247,7 +232,7 @@ class Speech_Recognition(object):
 						x= int( raw_input("Class of the current word\n"))
 						print "Labelclass is :" ,x
 						if (x!=0):
-								struct='Calibration/Roxane/%s'%AudioIO.TrainClasse(x)
+								struct='Calibration/Latyr/%s'%AudioIO.TrainClasse(x)
 								if not os.path.exists(struct) :
 										os.makedirs(struct)
 										print tools.bcolors.OKBLUE +"folder :" ,struct, "has been created" + tools.bcolors.ENDC

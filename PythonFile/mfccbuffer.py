@@ -149,12 +149,12 @@ class MFFCsRingBuffer(object):
 					if self.__flag=="done" :
 							if self.__tail< self.__lengthOfWindowMinima :
 									self.__flag="rejeted"
-									print "rejected"
+									#print "rejected"
 									self.__data=np.zeros(2600)
 									self.__head=0
 							else :
 									self.__flag="admit"
-									print "tail was :", self.__tail
+									#print "tail was :", self.__tail
 
 					return self.__flag
 
