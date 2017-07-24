@@ -97,37 +97,21 @@ class Speech_Recognition(object):
 			Theta=0.0#AudioIO.LoadParams('score_T.out')
 			Phi=0.0#AudioIO.LoadParams('score_P.out')
 			Center=[0.0,0.0,0.0]#AudioIO.LoadParams('center.out')
-			queue_class=Queue(1)#len(Theta)-10
 			while True :
 					self.__semaphore.acquire()
 					with self.__lock :
 							MfccsCoeffGet=MfccsCoeff 
 					self.__semaphoreLock.release()
-					#newcoeff=(self.__CoeffSphere.SphereAxis(MfccsCoeffGet))
-					threads=[]
-					for i in range(0,1):#,len(Theta)):
-						th=threading.Thread(target=self.SphereRotationPrediction,args=(Center,Theta,Phi,MfccsCoeffGet,svm,svmL,svmR,queue_class,))
-						th.start()
-						threads.append(th)
-					for i in threads :
-						i.join()
-					#print [queue_class.get() for _ in xrange(len(Theta)-11)]
-					classL=[queue_class.get() for _ in xrange(1)][0]#len(Theta)-10)][0]#len(Theta)-11
-					#print tools.bcolors.OKBLUE + "~~~~~  " ,AudioIO.ClassName(classL),"~~~~~  "+tools.bcolors.ENDC
+					newcoeff=self.__CoeffSphere.Sphere2Vector(MfccsCoeffGet,Center,Theta,Phi).T
+					classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
 					if classL != 8 :
 							self.write_Pipe(classL)
-					#print "Done ..."
 					    
 		def write_Pipe(self,classL):
 			with open('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name,'wb') as f:
 				f.write('{}\n'.format(len(bin(classL)[2:])).encode())
 				f.write(bin(classL)[2:])
 				f.flush()
-                   
-		def SphereRotationPrediction(self,Center,Theta,Phi,SphereData,svm,svmL,svmR,queue):
-				newcoeff=self.__CoeffSphere.Sphere2Vector(SphereData,Center,Theta,Phi).T
-				classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
-				queue.put(classL)
 			
 			
 		def VocalActivityDetection(self):
