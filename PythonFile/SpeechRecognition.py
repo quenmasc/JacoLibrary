@@ -232,7 +232,7 @@ class Speech_Recognition(object):
 						x= int( raw_input("Class of the current word\n"))
 						print "Labelclass is :" ,x
 						if (x!=0):
-								struct='Calibration/Latyr/%s'%AudioIO.TrainClasse(x)
+								struct='Calibration/Gabriel_GT/%s'%AudioIO.TrainClasse(x)
 								if not os.path.exists(struct) :
 										os.makedirs(struct)
 										print tools.bcolors.OKBLUE +"folder :" ,struct, "has been created" + tools.bcolors.ENDC
