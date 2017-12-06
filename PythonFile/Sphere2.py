@@ -68,7 +68,7 @@ class Sphere_calibration(object):
 		meanlz_e=0.0
 		incrm=0
 		incrm_e=0
-		
+		"""
 		for i in range(x.size):
 			if x[i]!=0.:
 				meanlx+=x[i]
@@ -81,13 +81,14 @@ class Sphere_calibration(object):
 					meanly_e+=y[i]
 					meanlz_e+=z[i]
 					incrm_e+=1
-		meanx=meanlx/incrm
-		meany=meanly/incrm
-		meanz=meanlz/incrm
-		meanx_e=meanlx_e/incrm_e
-		meany_e=meanly_e/incrm_e
-		meanz_e=meanlz_e/incrm_e
-		
+		"""
+		meanx=np.mean(x)#meanlx/incrm
+		meany=np.mean(y)#meanly/incrm
+		meanz=np.mean(z)#meanlz/incrm
+		meanx_e=np.mean(x_e)#meanlx_e/incrm_e
+		meany_e=np.mean(y_e)#meanly_e/incrm_e
+		meanz_e=np.mean(z_e)#meanlz_e/incrm_e
+		"""
 		for i in range(x.size):
 			if (x[i]!=0):# and y[i]!=0. and z[i]!=0.):
 				stdlx+=(x[i]-meanx)**2
@@ -99,13 +100,13 @@ class Sphere_calibration(object):
 					stdlz_e+=(z_e[i]-meanz_e)**2
 					incr_e+=1
 				incr+=1
-		
-		stdx=math.sqrt(stdlx/incr)
-		stdy=math.sqrt(stdly/incr)
-		stdz=math.sqrt(stdlz/incr)
-		stdx_e=math.sqrt(stdlx_e/incr_e)
-		stdy_e=math.sqrt(stdly_e/incr_e)
-		stdz_e=math.sqrt(stdlz_e/incr_e)
+		"""
+		stdx=np.std(x)#math.sqrt(stdlx/incr)
+		stdy=np.std(y)#math.sqrt(stdly/incr)
+		stdz=np.std(z)#math.sqrt(stdlz/incr)
+		stdx_e=np.std(x_e)#math.sqrt(stdlx_e/incr_e)
+		stdy_e=np.std(y_e)#math.sqrt(stdly_e/incr_e)
+		stdz_e=np.std(z_e)#math.sqrt(stdlz_e/incr_e)
 		# 0 mean and one std
 				## allocation of memory
 		new_x=np.zeros(self.__DataLength*self.__prof*12)
