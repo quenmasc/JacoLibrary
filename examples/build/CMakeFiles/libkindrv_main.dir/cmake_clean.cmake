@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/libkindrv_main.dir/main.cpp.o"
+  "CMakeFiles/libkindrv_main.dir/PythonBridge.cpp.o"
   "libkindrv_main.pdb"
   "libkindrv_main"
 )

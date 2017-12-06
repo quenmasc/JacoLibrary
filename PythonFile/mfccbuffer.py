@@ -38,7 +38,7 @@ class MFFCsRingBuffer(object):
 			self.__EnergyCoeffArray=np.empty(13,'f')
 			#   self.__SampleRingBuffer=RingBuffer.RingBuffer(24000,200,80)
 			self.__previous_amplitude_envelope=0.
-			self.__Env=Env=Limiter._Limiter()
+			self.__Env=Limiter._Limiter()
 			self.__Lock=Lock()
 	
 			#semaphore & Lock

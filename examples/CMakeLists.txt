@@ -52,12 +52,15 @@ else (LIBKINDRV_FOUND)
   message(FATAL_ERROR "Could not find libkindrv!")
 endif (LIBKINDRV_FOUND)
 
+include_directories (../include)
 #add_executable (libkindrv_ex_simple ex_simple.cpp)
 #add_executable (libkindrv_ex_ctrl ex_ctrl.cpp)
 #add_executable (libkindrv_ex_joystick ex_joystick.cpp)
 #add_executable (libkindrv_ex_dualarm ex_dualarm.cpp)
 #add_executable (libkindrv_ex_main ex_main.cpp )
-add_executable (libkindrv_main main.cpp )
+add_executable (libkindrv_main main.cpp 
+PythonBridge.cpp)
+
 
 #target_link_libraries (libkindrv_ex_simple ${LIBKINDRV_LIBRARIES})
 #target_link_libraries (libkindrv_ex_ctrl ${LIBKINDRV_LIBRARIES})

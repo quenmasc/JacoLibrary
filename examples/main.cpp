@@ -12,6 +12,7 @@
 #include <string>
 #include <cstdlib>
 #include <iomanip>
+#include "PythonBridge.h"
 
 #define RED "\x1b[31m"
 #define GREEN "\x1b[32m"
@@ -422,8 +423,8 @@ void PipeClass(JacoArm *arm,jaco_joystick_axis_t axes, std::queue<int> &my_queue
 	word="READY";
 	status="WAITING ORDER";
 	
-	const char *fifo_name="/home/pi/libkindrv/examples/build/fifo";
-	std::cout << "Pipe is opened" << std::endl;
+	const char *fifo_name="/home/pi/JacoLibrary/examples/build/fifo";
+	std::cout << "In main - Pipe is opened" << std::endl;
 	int n;
 	while(1){
 	mknod(fifo_name,S_IFIFO | 0666,0);
@@ -554,7 +555,7 @@ int main(){
 	printf(GREEN"*        SPEECH RECOGNITION MODULE   - Developed by Q.MASCRET               *" RESET "\n");
 	printf(GREEN"*****************************************************************************" RESET "\n");
 	printf("\n");
-
+	
   // explicitly initialize jaco_joystick_axis_t axesa libusb context; optional
   KinDrv::init_usb();
 

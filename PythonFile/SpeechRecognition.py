@@ -17,6 +17,7 @@ import os
 import time
 import errno
 import Sphere
+import Sphere2
 import SpectralSubstraction
 import math
 import wave
@@ -68,26 +69,26 @@ class Speech_Recognition(object):
 			self.__t3.start()
 			#self.__t1=threading.Thread(target=self.__ReadWrite.Recorder)
 			##self.__t1.start()
-			self.__t4=threading.Thread(target=self.Train)
-			self.__t4.start()
-			#self.__t2=threading.Thread(target=self.SVM)
-			#self.__t2.start()
+			##self.__t4=threading.Thread(target=self.Train)
+			##self.__t4.start()
+			self.__t2=threading.Thread(target=self.SVM)
+			self.__t2.start()
 			self.__ReadWrite.Recorder()
 		
 			
 		def SVM(self):
 			global MfccsCoeff
 			global Data
-			svm=AudioIO.LoadClassifier("SVM_Trained")
-			svmL=AudioIO.LoadClassifier("LeftSVM_Trained")
-			svmR=AudioIO.LoadClassifier("RightSVM_Trained")
-			self.__CoeffSphere=Sphere.Sphere_calibration();
+			svm=AudioIO.LoadClassifier("SVM_Trained_K")
+			svmL=AudioIO.LoadClassifier("LeftSVM_Trained_K")
+			svmR=AudioIO.LoadClassifier("RightSVM_Trained_K")
+			self.__CoeffSphere=Sphere2.Sphere_calibration();
 			try :
-				os.remove('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name)
+				os.remove('/home/pi/JacoLibrary/examples/build/%s' %self.__fifo_name)
 			except :
 				print "Pipe already removed"
 			try :
-				os.mkfifo('/home/pi/libkindrv/examples/build/%s'  %self.__fifo_name)
+				os.mkfifo('/home/pi/JacoLibrary/examples/build/%s'  %self.__fifo_name)
 			except OSError as e :
 				if e.errno==errno.EEXIST :
 					print("File already exist")
@@ -102,13 +103,13 @@ class Speech_Recognition(object):
 					with self.__lock :
 							MfccsCoeffGet=MfccsCoeff 
 					self.__semaphoreLock.release()
-					newcoeff=self.__CoeffSphere.Sphere2Vector(MfccsCoeffGet,Center,Theta,Phi).T
+					newcoeff=self.__CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test").T
 					classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
 					if classL != 8 :
 							self.write_Pipe(classL)
 					    
 		def write_Pipe(self,classL):
-			with open('/home/pi/libkindrv/examples/build/%s' %self.__fifo_name,'wb') as f:
+			with open('/home/pi/JacoLibrary/examples/build/%s' %self.__fifo_name,'wb') as f:
 				f.write('{}\n'.format(len(bin(classL)[2:])).encode())
 				f.write(bin(classL)[2:])
 				f.flush()

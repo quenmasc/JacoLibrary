@@ -6,7 +6,21 @@
 
 #IncludeRegexTransform: 
 
-/home/pi/libkindrv/examples/main.cpp
+../../include/PythonBridge.h
+python2.7/Python.h
+-
+stdlib.h
+-
+stdio.h
+-
+string
+-
+
+/home/pi/JacoLibrary/examples/PythonBridge.cpp
+PythonBridge.h
+/home/pi/JacoLibrary/examples/PythonBridge.h
+
+/home/pi/JacoLibrary/examples/main.cpp
 stdio.h
 -
 stdlib.h
@@ -35,4 +49,6 @@ cstdlib
 -
 iomanip
 -
+PythonBridge.h
+/home/pi/JacoLibrary/examples/PythonBridge.h
 

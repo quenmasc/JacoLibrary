@@ -9,7 +9,7 @@ import time
 import DSP
 import wave
 import os
-from threading import Thread , Semaphore
+from threading import Thread , Semaphore , Condition
 import alsaaudio as alsa
 import struct
 import DSP
@@ -43,11 +43,16 @@ class RingBuffer(object):
 				self.__ReadQueue= Queue()
 				self.__USBData = Queue()
 				
+				## Condition
+				self.__condition=Condition()
+				
 		def Writer(self,data):
 				with self.__ServiceQueue :
 						self.__RessourceAccess.acquire()
 				#print "Write" 
 				self.IsFull_Write(data)
+				#with self.__condition:#
+				#	self.__condition.notify()#
 				self.__RessourceAccess.release()
 			
 			
@@ -64,13 +69,15 @@ class RingBuffer(object):
 				self.__head=Next
 				return 0
 		def Reader(self):
+			#with self.__condition:#
+				#self.__condition.wait()#
 				self.__ServiceQueue.acquire()
 				with self.__ReadCountAccess :
 						if (self.__readCount ==0) :
 								self.__RessourceAccess.acquire()
 						self.__readCount+=1
 						self.__ServiceQueue.release()
-				#print "Read"
+			#	print "Read"
 				self.IsEmpty_Read()
 				with self.__ReadCountAccess :
 						self.__readCount-=1

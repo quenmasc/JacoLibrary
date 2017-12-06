@@ -1,7 +1,6 @@
 # all import here
 import os
 import numpy as np
-from pydub import AudioSegment
 from scipy.io.wavfile import read
 import inspect 
 import mfccbuffer
@@ -343,7 +342,7 @@ def SaveClassifier(modelName,svmClassifier):
     
 def LoadClassifier(SVMModelName):
     try : 
-        model=joblib.load("/home/pi/libkindrv/PythonFile/SVModel/%s.pkl"%SVMModelName)
+        model=joblib.load("/home/pi/JacoLibrary/PythonFile/SVModel/%s.pkl"%SVMModelName)
         print tools.bcolors.OKGREEN + "Classifier loaded %s"%SVMModelName + tools.bcolors.ENDC
         return model
     except IOError :
@@ -353,7 +352,7 @@ def LoadClassifier(SVMModelName):
 
 def LoadParams(SVMModelName):
     try : 
-        model=np.loadtxt("/home/pi/libkindrv/PythonFile/Properties_file/%s"%SVMModelName)
+        model=np.loadtxt("/home/pi/JacoLibrary/PythonFile/Properties_file/%s"%SVMModelName)
         print tools.bcolors.OKGREEN + "Classifier loaded %s"%SVMModelName + tools.bcolors.ENDC
         return model[1+np.arange(len(model)-1)]
     except IOError :
