@@ -48,12 +48,12 @@ class RingBuffer(object):
 				
 		def Writer(self,data):
 				with self.__ServiceQueue :
-						self.__RessourceAccess.acquire()
+				#		self.__RessourceAccess.acquire()
 				#print "Write" 
-				self.IsFull_Write(data)
+					self.IsFull_Write(data)# remove tab
 				#with self.__condition:#
 				#	self.__condition.notify()#
-				self.__RessourceAccess.release()
+				#self.__RessourceAccess.release()
 			
 			
 		def IsFull_Write(self,data):
@@ -71,6 +71,7 @@ class RingBuffer(object):
 		def Reader(self):
 			#with self.__condition:#
 				#self.__condition.wait()#
+				"""
 				self.__ServiceQueue.acquire()
 				with self.__ReadCountAccess :
 						if (self.__readCount ==0) :
@@ -78,11 +79,15 @@ class RingBuffer(object):
 						self.__readCount+=1
 						self.__ServiceQueue.release()
 			#	print "Read"
-				self.IsEmpty_Read()
+				"""
+				with self.__ServiceQueue:
+					self.IsEmpty_Read()# remote tab
+				"""
 				with self.__ReadCountAccess :
 						self.__readCount-=1
 						if (self.__readCount ==0):
 								self.__RessourceAccess.release()
+				"""
 		def IsEmpty_Read(self):
 			#	print self.__head , self.__tail 
 				if (self.__head == self.__tail):
