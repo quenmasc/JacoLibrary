@@ -72,17 +72,22 @@ class RingBuffer(object):
 			#with self.__condition:#
 				#self.__condition.wait()#
 				self.__ServiceQueue.acquire()
+				"""
 				with self.__ReadCountAccess :
 						if (self.__readCount ==0) :
-								self.__RessourceAccess.acquire()
+				"""
+				self.__RessourceAccess.acquire()
+				"""
 						self.__readCount+=1
-						self.__ServiceQueue.release()
+				"""
+				self.__ServiceQueue.release()
 			#	print "Read"
 				self.IsEmpty_Read()
-				with self.__ReadCountAccess :
-						self.__readCount-=1
-						if (self.__readCount ==0):
-								self.__RessourceAccess.release()
+			#	with self.__ReadCountAccess :
+			#			self.__readCount-=1
+			#			if (self.__readCount ==0):
+				self.__RessourceAccess.release()
+				
 		def IsEmpty_Read(self):
 			#	print self.__head , self.__tail 
 				if (self.__head == self.__tail):

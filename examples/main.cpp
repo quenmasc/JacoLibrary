@@ -12,6 +12,7 @@
 #include <string>
 #include <cstdlib>
 #include <iomanip>
+#include <time>
 #include "PythonBridge.h"
 
 #define RED "\x1b[31m"
@@ -530,8 +531,6 @@ void Result (std::queue<int> &my_queue,JacoArm *arm,jaco_joystick_axis_t axes, j
 		while(!my_queue.empty()){
 		n=my_queue.front();
 		my_queue.pop();
-		//buttonValue = arm ->get_button_info();
-		//std::cout <<*buttonValue.button << std::endl;
 		}
 	
 		ModeCHange(arm,axes, OldClass,  n);

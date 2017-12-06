@@ -100,14 +100,14 @@ class Speech_Recognition(object):
 			Center=[0.0,0.0,0.0]#AudioIO.LoadParams('center.out')
 			while True :
 					self.__semaphore.acquire()
-					with self.__lock :
-							MfccsCoeffGet=MfccsCoeff 
+					#with self.__lock :
+					MfccsCoeffGet=MfccsCoeff 
 					self.__semaphoreLock.release()
 					newcoeff=self.__CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test").T
 					classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
 					if classL != 8 :
 							self.write_Pipe(classL)
-					    
+					
 		def write_Pipe(self,classL):
 			with open('/home/pi/JacoLibrary/examples/build/%s' %self.__fifo_name,'wb') as f:
 				f.write('{}\n'.format(len(bin(classL)[2:])).encode())
@@ -205,8 +205,8 @@ class Speech_Recognition(object):
 								#print fl
 								if fl=="admit" :
 										self.__semaphoreLock.acquire()
-										with self.__lock :
-											MfccsCoeff=buff.Reader()
+										#with self.__lock :
+										MfccsCoeff=buff.Reader()
 										self.__semaphore.release()
 						     
     

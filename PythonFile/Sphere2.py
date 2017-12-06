@@ -51,7 +51,7 @@ class Sphere_calibration(object):
 		y=self.__feature[(14+np.arange(12)),:].reshape(self.__feature[(14+np.arange(12)),:].size, order='F')
 		z=self.__feature[(27+np.arange(12)),:].reshape(self.__feature[(27+np.arange(12)),:].size, order='F')
 	
-	
+		"""
 		incr=0
 		incr_e=0
 		stdlx=0.0
@@ -68,7 +68,7 @@ class Sphere_calibration(object):
 		meanlz_e=0.0
 		incrm=0
 		incrm_e=0
-		"""
+		
 		for i in range(x.size):
 			if x[i]!=0.:
 				meanlx+=x[i]
@@ -171,25 +171,12 @@ class Sphere_calibration(object):
 				if math.isnan(SphereData_e[k,i])==True :
 					SphereData_e[k,i]=0
 		feat_struct=np.concatenate((SphereData_e[:,0].reshape(1,self.__prof*self.__DataLength,order='F'),SphereData[:,0].reshape(12,self.__prof*self.__DataLength,order='F'),SphereData_e[:,1].reshape(1,self.__prof*self.__DataLength,order='F'),SphereData[:,1].reshape(12,self.__prof*self.__DataLength,order='F'),SphereData_e[:,2].reshape(1,self.__prof*self.__DataLength,order='F'),SphereData[:,2].reshape(12,self.__prof*self.__DataLength,order='F')),axis=0)
-		## plot 3D
-		#fig=plt.figure()
-		#ax=fig.add_subplot(111,projection='3d')
-		#xs=SphereData[:,0]
-		#ys=SphereData[:,1]
-		#zs=SphereData[:,2]
-		#ax.scatter(xs,ys,zs,c='r',marker='o')
-		#
-		#ax.set_xlabel('X Label')
-		#ax.set_ylabel('Y Label')
-		#ax.set_zlabel('Z Label')
-		#plt.show()
-		# return features matrix
-				## allocation of memory
+
 		features=np.zeros((39*self.__prof,self.__DataLength))
 		for i in range (0,self.__DataLength):
 			intermediaire=feat_struct[:,(i*self.__prof+np.arange(self.__prof))]
 			features[:,i]=intermediaire.reshape(intermediaire.size, order='F')
-		print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ..." + tools.bcolors.ENDC
+		#print tools.bcolors.OKGREEN + "In Sphere - Calibration has been done ..." + tools.bcolors.ENDC
 					
 					
 		return features
