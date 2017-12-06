@@ -36,7 +36,7 @@ class RingBuffer(object):
 				## semaphore & Lock
 				self.__RessourceAccess= Semaphore(1)
 				self.__ReadCountAccess = Semaphore (1)
-				self.__ServiceQueue = Semaphore (1)
+				self.__ServiceQueue = Lock() #Semaphore (1)
 				self.__readCount=0
 				
 				## Queue
