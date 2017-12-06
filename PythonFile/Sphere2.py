@@ -34,7 +34,6 @@ class Sphere_calibration(object):
 		elif types =="train" :
 			self.__prof=int((features.size/features.shape[1])/39)
 		self.__feature=np.zeros((39,self.__DataLength*self.__prof))
-		print self.__prof , self.__DataLength
 		if (types=="train"):
 			for i in range(0,self.__DataLength):
 				idx=(i*self.__prof+np.arange(self.__prof))

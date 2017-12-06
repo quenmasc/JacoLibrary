@@ -1,4 +1,5 @@
 import alsaaudio as alsa
+from threading import Condition
 from multiprocessing import Process, Queue , Pool , Lock
 import numpy as np
 import alsa_record
@@ -50,6 +51,7 @@ class Speech_Recognition(object):
 			#   self.__event=Event()
 			self.__lock=Lock()
 			self.__lock2 = Lock()
+			self.__mfccCondition=Condition()
 			self.__fifo_name= 'fifo'
 			
 			## shared constructor
@@ -99,10 +101,12 @@ class Speech_Recognition(object):
 			Phi=0.0#AudioIO.LoadParams('score_P.out')
 			Center=[0.0,0.0,0.0]#AudioIO.LoadParams('center.out')
 			while True :
-					self.__semaphore.acquire()
+					#self.__semaphore.acquire()
 					#with self.__lock :
-					MfccsCoeffGet=MfccsCoeff 
-					self.__semaphoreLock.release()
+					with self.__mfccCondition:
+						self.__mfccCondition.wait()
+						MfccsCoeffGet=MfccsCoeff 
+					#self.__semaphoreLock.release()
 					newcoeff=self.__CoeffSphere.ClassAndFeaturesSplit(MfccsCoeffGet,"test").T
 					classL=int(MachineLearning.ClassifierWrapper(svm, svmL, svmR,newcoeff)[1][0])
 					if classL != 8 :
@@ -204,10 +208,13 @@ class Speech_Recognition(object):
 								fl=buff.flag(corr,th,entropyDistance,entropyThreshN,coeff,energy,c)
 								#print fl
 								if fl=="admit" :
-										self.__semaphoreLock.acquire()
-										#with self.__lock :
-										MfccsCoeff=buff.Reader()
-										self.__semaphore.release()
+										#self.__semaphoreLock.acquire()
+										with self.__mfccCondition:
+											#with self.__lock :
+											MfccsCoeff=buff.Reader()
+											self.__mfccCondition.notify()
+										#self.__mfccCondition.release()
+										#self.__semaphore.release()
 						     
     
 

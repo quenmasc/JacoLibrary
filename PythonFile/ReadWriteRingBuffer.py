@@ -38,7 +38,7 @@ class RingBuffer(object):
 				self.__ReadCountAccess = Semaphore (1)
 				self.__ServiceQueue = Semaphore (1)
 				self.__readCount=0
-				
+				self.__cost=0
 				## Queue
 				self.__ReadQueue= Queue()
 				self.__USBData = Queue()
@@ -51,8 +51,8 @@ class RingBuffer(object):
 						self.__RessourceAccess.acquire()
 				#print "Write" 
 				self.IsFull_Write(data)
-				#with self.__condition:#
-				#	self.__condition.notify()#
+				with self.__condition:#
+					self.__condition.notify()#
 				self.__RessourceAccess.release()
 			
 			
@@ -71,6 +71,9 @@ class RingBuffer(object):
 		def Reader(self):
 			#with self.__condition:#
 				#self.__condition.wait()#
+				if (self.__cost==-1):
+					with self.__condition:
+						self.__condition.wait()
 				self.__ServiceQueue.acquire()
 				"""
 				with self.__ReadCountAccess :
@@ -82,11 +85,13 @@ class RingBuffer(object):
 				"""
 				self.__ServiceQueue.release()
 			#	print "Read"
-				self.IsEmpty_Read()
+				self.__cost=self.IsEmpty_Read()
+				
 			#	with self.__ReadCountAccess :
 			#			self.__readCount-=1
 			#			if (self.__readCount ==0):
 				self.__RessourceAccess.release()
+				
 				
 		def IsEmpty_Read(self):
 			#	print self.__head , self.__tail 
