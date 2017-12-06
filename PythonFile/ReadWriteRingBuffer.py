@@ -37,8 +37,9 @@ class RingBuffer(object):
 				self.__RessourceAccess= Semaphore(1)
 				self.__ReadCountAccess = Semaphore (1)
 				self.__ServiceQueue = Lock() #Semaphore (1)
+				self.__WriterCondition= Condition()
 				self.__readCount=0
-				
+				self.__readStatus=0
 				## Queue
 				self.__ReadQueue= Queue()
 				self.__USBData = Queue()
@@ -47,14 +48,8 @@ class RingBuffer(object):
 				self.__condition=Condition()
 				
 		def Writer(self,data):
-				with self.__ServiceQueue :
-				#		self.__RessourceAccess.acquire()
-				#print "Write" 
-					self.IsFull_Write(data)# remove tab
-				#with self.__condition:#
-				#	self.__condition.notify()#
-				#self.__RessourceAccess.release()
-			
+				with self.__ServiceQueue:
+					self.IsFull_Write(data)
 			
 		def IsFull_Write(self,data):
 				Next=self.__head+len(data)
@@ -69,30 +64,13 @@ class RingBuffer(object):
 				self.__head=Next
 				return 0
 		def Reader(self):
-			#with self.__condition:#
-				#self.__condition.wait()#
-				"""
-				self.__ServiceQueue.acquire()
-				with self.__ReadCountAccess :
-						if (self.__readCount ==0) :
-								self.__RessourceAccess.acquire()
-						self.__readCount+=1
-						self.__ServiceQueue.release()
-			#	print "Read"
-				"""
 				with self.__ServiceQueue:
-					self.IsEmpty_Read()# remote tab
-				"""
-				with self.__ReadCountAccess :
-						self.__readCount-=1
-						if (self.__readCount ==0):
-								self.__RessourceAccess.release()
-				"""
+					self.IsEmpty_Read()
+					
 		def IsEmpty_Read(self):
 			#	print self.__head , self.__tail 
 				if (self.__head == self.__tail):
-						#print "No Data"
-						return -1
+						return -2
 				Next=self.__tail+self.__window
 				if ( Next >= self.__MaxLen):
 						Next = Next-self.__MaxLen
