@@ -45,13 +45,15 @@ class MFFCsRingBuffer(object):
 			self.__RessourceAccess= Semaphore(1)
 			self.__ReadCountAccess = Semaphore (1)
 			self.__ServiceQueue = Semaphore (1)
+			self.__RWLock=Lock()
 			self.__readCount=0
             
 	def Writer(self, data):
-			with self.__ServiceQueue :
-						self.__RessourceAccess.acquire()
-			self.extend(data)
-			self.__RessourceAccess.release()
+			#with self.__ServiceQueue :
+			#			self.__RessourceAccess.acquire()
+			with self.__RWLock:
+				self.extend(data)
+			#self.__RessourceAccess.release()
 			
                 
 	def extend(self,data):
@@ -65,17 +67,18 @@ class MFFCsRingBuffer(object):
 				return 0
 				
 	def Reader(self):
-				self.__ServiceQueue.acquire()
-				with self.__ReadCountAccess :
-						if (self.__readCount ==0) :
-								self.__RessourceAccess.acquire()
-						self.__readCount+=1
-						self.__ServiceQueue.release()
-				data=self.get()
-				with self.__ReadCountAccess :
-						self.__readCount-=1
-						if (self.__readCount ==0):
-								self.__RessourceAccess.release()
+				#self.__ServiceQueue.acquire()
+				#with self.__ReadCountAccess :
+				#		if (self.__readCount ==0) :
+				#				self.__RessourceAccess.acquire()
+				#		self.__readCount+=1
+				#		self.__ServiceQueue.release()
+				with self.__RWLock:
+					data=self.get()
+				#with self.__ReadCountAccess :
+				#		self.__readCount-=1
+				#		if (self.__readCount ==0):
+				#				self.__RessourceAccess.release()
 				return data			
         
 	def get(self):
